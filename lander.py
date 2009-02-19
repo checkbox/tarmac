@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os
+import sys
 
 from bzrlib import branch
 from bzrlib.plugin import load_plugins
@@ -16,8 +17,13 @@ launchpad = Launchpad.get_token_and_login('Tarmac',
 #launchpad.credentials.save(file(LOGIN_CREDENTIALS, 'w'))
 
 project = launchpad.projects['loggerhead']
-import pdb; pdb.set_trace()
-trunk_entry = project.development_focus.branch
+try:
+    trunk_entry = project.development_focus.branch
+except AttributeError:
+    print ('Oops!  It looks like you\'ve forgotten to specify a development '
+    'focus branch.  Please link your "trunk" branch to the trunk '
+    'development focus.')
+    sys.exit()
 
 candidates = []
 for entry in trunk_entry.landing_candidates:
