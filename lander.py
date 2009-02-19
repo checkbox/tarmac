@@ -5,16 +5,26 @@ import sys
 
 from bzrlib import branch
 from bzrlib.plugin import load_plugins
-from launchpadlib.launchpad import Launchpad
+from launchpadlib.launchpad import Credentials, Launchpad
+
+from tarmac.config import TarmacConfig
 
 load_plugins()
+
+configuration = TarmacConfig()
 
 cachedir = '/tmp/tarmac-cache-%(pid)s' % {'pid': os.getpid()}
 print 'Caching to %(cachedir)s' % {'cachedir': cachedir}
 
-launchpad = Launchpad.get_token_and_login('Tarmac',
-    'https://api.launchpad.dev/beta/', cachedir)
-#launchpad.credentials.save(file(LOGIN_CREDENTIALS, 'w'))
+if not os.path.exists(configuration.CREDENTIALS):
+    launchpad = Launchpad.get_token_and_login('Tarmac',
+        'https://api.launchpad.dev/beta/', cachedir)
+    launchpad.credentials.save(file(configuration.CREDENTIALS, 'w'))
+else:
+    credentials = Credentials()
+    credentials.load(open(configuration.CREDENTIALS))
+    launchpad = Launchpad(credentials, 'https://api.launchpad.dev/beta/',
+        cachedir)
 
 project = launchpad.projects['loggerhead']
 try:
