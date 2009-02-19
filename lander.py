@@ -32,9 +32,9 @@ for entry in trunk_entry.landing_candidates:
         print '      will land.'
         candidates.append(entry)
 
-for candidate in candidates:
-    print 'Branching %s to %s' % (candidate.target_branch.bzr_identity,
-        '/tmp/123456')
+#for candidate in candidates:
+    #print 'Branching %s to %s' % (candidate.target_branch.bzr_identity,
+    #    '/tmp/123456')
     #trunk = branch.Branch.open(candidate.target_branch.bzr_identity)
     #source = branch.Branch.open(candidate.source_branch.bzr_identity)
     #trunk_checkout = trunk.create_checkout('/tmp/1234561')
