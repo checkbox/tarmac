@@ -3,14 +3,15 @@
 import os
 import sys
 
-from bzrlib import branch
+from bzrlib import branch, bzrdir
 from bzrlib.plugin import load_plugins
-from launchpadlib.launchpad import Credentials, Launchpad
+from launchpadlib.errors import HTTPError
+from launchpadlib.launchpad import Credentials, Launchpad, STAGING_SERVICE_ROOT
 
 from tarmac.config import TarmacConfig
 
 load_plugins()
-
+DEV_SERVICE_ROOT = 'https://api.launchpad.dev/beta/'
 configuration = TarmacConfig()
 
 cachedir = '/tmp/tarmac-cache-%(pid)s' % {'pid': os.getpid()}
@@ -18,39 +19,47 @@ print 'Caching to %(cachedir)s' % {'cachedir': cachedir}
 
 if not os.path.exists(configuration.CREDENTIALS):
     launchpad = Launchpad.get_token_and_login('Tarmac',
-        'https://api.launchpad.dev/beta/', cachedir)
+        DEV_SERVICE_ROOT, cachedir)
     launchpad.credentials.save(file(configuration.CREDENTIALS, 'w'))
 else:
-    credentials = Credentials()
-    credentials.load(open(configuration.CREDENTIALS))
-    launchpad = Launchpad(credentials, 'https://api.launchpad.dev/beta/',
-        cachedir)
+    try:
+        credentials = Credentials()
+        credentials.load(open(configuration.CREDENTIALS))
+        launchpad = Launchpad(credentials, DEV_SERVICE_ROOT, cachedir)
+    except HTTPError:
+        print ('Oops!  It appears that the OAuth token is invalid.  Please '
+        'delete %(credential_file)s and re-authenticate.' %
+            {'credential_file': configuration.CREDENTIALS})
+        sys.exit()
 
 project = launchpad.projects['loggerhead']
 try:
-    trunk_entry = project.development_focus.branch
+    trunk = project.development_focus.branch
 except AttributeError:
     print ('Oops!  It looks like you\'ve forgotten to specify a development '
     'focus branch.  Please link your "trunk" branch to the trunk '
     'development focus.')
     sys.exit()
 
-candidates = []
-for entry in trunk_entry.landing_candidates:
-    print entry.source_branch.display_name
-    if entry.queue_status == u'Approved':
-        print '      will land.'
-        candidates.append(entry)
+candidates = [entry for entry in trunk.landing_candidates
+                if entry.queue_status == u'Approved']
 
-#for candidate in candidates:
-    #print 'Branching %s to %s' % (candidate.target_branch.bzr_identity,
-    #    '/tmp/123456')
-    #trunk = branch.Branch.open(candidate.target_branch.bzr_identity)
-    #source = branch.Branch.open(candidate.source_branch.bzr_identity)
-    #trunk_checkout = trunk.create_checkout('/tmp/1234561')
+for candidate in candidates:
+    temp_dir = '/tmp/merge-%(source)s-%(pid)s' % {
+        'source': candidate.source_branch.name,
+        'pid': os.getpid()
+        }
+    os.mkdir(temp_dir)
 
-    #trunk_tree.merge(candidate.source_branch.bzr_identity)
+    accelerator, target_branch = bzrdir.BzrDir.open_tree_or_branch(
+        candidate.target_branch.bzr_identity)
+    target_tree = target_branch.create_checkout(
+        temp_dir, None, True, accelerator)
+    source_branch = branch.Branch.open(candidate.source_branch.bzr_identity)
+
+    target_tree.merge_from_branch(source_branch)
+    import pdb; pdb.set_trace()
     # TODO: Add hook code.
-    #trunk_tree.commit(candidates.all_comments.entries[0])
-    #trunk.push(trunk_remote)
+    #trunk_tree.commit(candidate.all_comments.entries[0])
+
 
