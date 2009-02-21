@@ -12,7 +12,7 @@ setup(
     url=u'http://edge.launchpad.net/tarmac',
     license=u'AGPLv3',
     packages=['tarmac'],
-    scripts=['lander.py'],
+    scripts=['tarmac-lander'],
     long_description='''
         Tarmac is a series of scripts to facilitate the landing of Bazaar
         branches in Launchpad (http://edge.launchpad.net).''',
