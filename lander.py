@@ -19,13 +19,13 @@ print 'Caching to %(cachedir)s' % {'cachedir': cachedir}
 
 if not os.path.exists(configuration.CREDENTIALS):
     launchpad = Launchpad.get_token_and_login('Tarmac',
-        DEV_SERVICE_ROOT, cachedir)
+        STAGING_SERVICE_ROOT, cachedir)
     launchpad.credentials.save(file(configuration.CREDENTIALS, 'w'))
 else:
     try:
         credentials = Credentials()
         credentials.load(open(configuration.CREDENTIALS))
-        launchpad = Launchpad(credentials, DEV_SERVICE_ROOT, cachedir)
+        launchpad = Launchpad(credentials, STAGING_SERVICE_ROOT, cachedir)
     except HTTPError:
         print ('Oops!  It appears that the OAuth token is invalid.  Please '
         'delete %(credential_file)s and re-authenticate.' %
@@ -58,8 +58,7 @@ for candidate in candidates:
     source_branch = branch.Branch.open(candidate.source_branch.bzr_identity)
 
     target_tree.merge_from_branch(source_branch)
-    import pdb; pdb.set_trace()
     # TODO: Add hook code.
-    #trunk_tree.commit(candidate.all_comments.entries[0])
+    trunk_tree.commit(candidate.all_comments[0].message_body)
 
 
