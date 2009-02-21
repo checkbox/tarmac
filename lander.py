@@ -1,3 +1,4 @@
+# Copyright (c) 2009 - Paul Hummer
 #!/usr/bin/env python
 
 import os

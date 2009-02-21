@@ -1,3 +1,4 @@
+# Copyright (c) 2009 - Paul Hummer
 '''Configuration handler.'''
 from ConfigParser import SafeConfigParser as ConfigParser
 import os
