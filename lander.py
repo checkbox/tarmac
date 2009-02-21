@@ -2,7 +2,6 @@
 #!/usr/bin/env python
 
 from tarmac.bin import main
-
 main()
 
 
