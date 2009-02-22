@@ -1,20 +1,21 @@
 # Copyright (c) 2009 - Paul Hummer
 '''Code used by Tarmac scripts.'''
+import os
+import sys
+
+from bzrlib import branch, bzrdir
+from bzrlib.plugin import load_plugins
+from launchpadlib.errors import HTTPError
+from launchpadlib.launchpad import Credentials, Launchpad, STAGING_SERVICE_ROOT
+
+from tarmac.config import TarmacConfig
+
+load_plugins()
+DEV_SERVICE_ROOT = 'https://api.launchpad.dev/beta/'
+
 
 def main():
     '''Tarmac script.'''
-    import os
-    import sys
-
-    from bzrlib import branch, bzrdir
-    from bzrlib.plugin import load_plugins
-    from launchpadlib.errors import HTTPError
-    from launchpadlib.launchpad import Credentials, Launchpad, STAGING_SERVICE_ROOT
-
-    from tarmac.config import TarmacConfig
-
-    load_plugins()
-    DEV_SERVICE_ROOT = 'https://api.launchpad.dev/beta/'
     configuration = TarmacConfig()
 
     cachedir = '/tmp/tarmac-cache-%(pid)s' % {'pid': os.getpid()}
