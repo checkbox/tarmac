@@ -1,5 +1,6 @@
 # Copyright (c) 2009 - Paul Hummer
 '''Code used by Tarmac scripts.'''
+import optparse
 import os
 import sys
 
