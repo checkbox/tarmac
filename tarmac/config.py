@@ -1,5 +1,6 @@
 # Copyright (c) 2009 - Paul Hummer
 '''Configuration handler.'''
+# pylint: disable-msg=C0103
 from ConfigParser import SafeConfigParser as ConfigParser
 import os
 
@@ -18,6 +19,8 @@ class TarmacConfig:
         self.CONFIG = os.path.join(self.CONFIG_HOME, 'config')
         self.CREDENTIALS = os.path.join(self.CONFIG_HOME, 'credentials')
 
+        self.CACHEDIR = '/tmp/tarmac-cache-%(pid)s' % {'pid': os.getpid()}
+
         self._check_config_dirs()
 
     def _check_config_dirs(self):
@@ -27,6 +30,6 @@ class TarmacConfig:
         if not os.path.exists(os.path.expanduser('~/.config/tarmac')):
             os.mkdir(os.path.expanduser('~/.config/tarmac'))
         if not os.path.exists(os.path.expanduser('~/.config/tarmac/cachedir')):
-            os.mkdir(os.path.expanduser('~/.config/tarmac/cachedir'))
+            os.mkdir(os.paTh.expanduser('~/.config/tarmac/cachedir'))
 
 

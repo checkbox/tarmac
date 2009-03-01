@@ -19,31 +19,31 @@ def main():
     '''Tarmac script.'''
     configuration = TarmacConfig()
 
-    cachedir = '/tmp/tarmac-cache-%(pid)s' % {'pid': os.getpid()}
-    print 'Caching to %(cachedir)s' % {'cachedir': cachedir}
-
     if not os.path.exists(configuration.CREDENTIALS):
         launchpad = Launchpad.get_token_and_login('Tarmac',
-            STAGING_SERVICE_ROOT, cachedir)
+            STAGING_SERVICE_ROOT, configuration.CACHEDIR)
         launchpad.credentials.save(file(configuration.CREDENTIALS, 'w'))
     else:
         try:
             credentials = Credentials()
             credentials.load(open(configuration.CREDENTIALS))
-            launchpad = Launchpad(credentials, STAGING_SERVICE_ROOT, cachedir)
+            launchpad = Launchpad(credentials, STAGING_SERVICE_ROOT,
+                configuration.CACHEDIR)
         except HTTPError:
-            print ('Oops!  It appears that the OAuth token is invalid.  Please '
-            'delete %(credential_file)s and re-authenticate.' %
-                {'credential_file': configuration.CREDENTIALS})
+            print (
+                'Oops!  It appears that the OAuth token is invalid.  Please '
+                'delete %(credential_file)s and re-authenticate.' %
+                    {'credential_file': configuration.CREDENTIALS})
             sys.exit()
 
     project = launchpad.projects['loggerhead']
     try:
         trunk = project.development_focus.branch
     except AttributeError:
-        print ('Oops!  It looks like you\'ve forgotten to specify a development '
-        'focus branch.  Please link your "trunk" branch to the trunk '
-        'development focus.')
+        print (
+            'Oops!  It looks like you\'ve forgotten to specify a development '
+            'focus branch.  Please link your "trunk" branch to the trunk '
+            'development focus.')
         sys.exit()
 
     candidates = [entry for entry in trunk.landing_candidates
@@ -64,7 +64,7 @@ def main():
 
         target_tree.merge_from_branch(source_branch)
         # TODO: Add hook code.
-        trunk_tree.commit(candidate.all_comments[0].message_body)
+        target_tree.commit(candidate.all_comments[0].message_body)
 
 
 
