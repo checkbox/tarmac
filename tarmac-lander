@@ -1,7 +1,8 @@
 # Copyright (c) 2009 - Paul Hummer
 #!/usr/bin/env python
+import sys
 
 from tarmac.bin import main
-main()
+main(*sys.argv)
 
 

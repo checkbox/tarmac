@@ -15,7 +15,7 @@ load_plugins()
 DEV_SERVICE_ROOT = 'https://api.launchpad.dev/beta/'
 
 
-def main():
+def main(*args, **kwargs):
     '''Tarmac script.'''
     configuration = TarmacConfig()
 
@@ -36,7 +36,7 @@ def main():
                     {'credential_file': configuration.CREDENTIALS})
             sys.exit()
 
-    project = launchpad.projects['loggerhead']
+    project = launchpad.projects[args[1]]
     try:
         trunk = project.development_focus.branch
     except AttributeError:
@@ -60,7 +60,8 @@ def main():
             candidate.target_branch.bzr_identity)
         target_tree = target_branch.create_checkout(
             temp_dir, None, True, accelerator)
-        source_branch = branch.Branch.open(candidate.source_branch.bzr_identity)
+        source_branch = branch.Branch.open(
+            candidate.source_branch.bzr_identity)
 
         target_tree.merge_from_branch(source_branch)
         # TODO: Add hook code.
