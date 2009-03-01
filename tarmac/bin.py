@@ -7,9 +7,9 @@ import sys
 from bzrlib import branch, bzrdir
 from bzrlib.plugin import load_plugins
 from launchpadlib.errors import HTTPError
-from launchpadlib.launchpad import Credentials, Launchpad, STAGING_SERVICE_ROOT
 
 from tarmac.config import TarmacConfig
+from tarmac.utils import get_launchpad_object
 
 load_plugins()
 DEV_SERVICE_ROOT = 'https://api.launchpad.dev/beta/'
@@ -19,24 +19,26 @@ def main(*args, **kwargs):
     '''Tarmac script.'''
     configuration = TarmacConfig()
 
-    if not os.path.exists(configuration.CREDENTIALS):
-        launchpad = Launchpad.get_token_and_login('Tarmac',
-            STAGING_SERVICE_ROOT, configuration.CACHEDIR)
-        launchpad.credentials.save(file(configuration.CREDENTIALS, 'w'))
-    else:
-        try:
-            credentials = Credentials()
-            credentials.load(open(configuration.CREDENTIALS))
-            launchpad = Launchpad(credentials, STAGING_SERVICE_ROOT,
-                configuration.CACHEDIR)
-        except HTTPError:
-            print (
-                'Oops!  It appears that the OAuth token is invalid.  Please '
-                'delete %(credential_file)s and re-authenticate.' %
-                    {'credential_file': configuration.CREDENTIALS})
-            sys.exit()
+    try:
+        launchpad = get_launchpad_object(configuration)
+    except HTTPError:
+        print (
+            'Oops!  It appears that the OAuth token is invalid.  Please '
+            'delete %(credential_file)s and re-authenticate.' %
+                {'credential_file': configuration.CREDENTIALS})
+        sys.exit()
 
-    project = launchpad.projects[args[1]]
+    try:
+        project = launchpad.projects[args[1]]
+    except IndexError:
+        # This code is merely a placeholder until I can get proper argument
+        # handling, at which point this should print usage information.
+        print (
+            'Oops!  You\'ve forgotten to specify a project to land branches '
+            'for.  Please specify your project as the first argument to '
+            'tarmac-lander.')
+        sys.exit()
+
     try:
         trunk = project.development_focus.branch
     except AttributeError:
