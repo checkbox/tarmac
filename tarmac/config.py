@@ -30,6 +30,6 @@ class TarmacConfig:
         if not os.path.exists(os.path.expanduser('~/.config/tarmac')):
             os.mkdir(os.path.expanduser('~/.config/tarmac'))
         if not os.path.exists(os.path.expanduser('~/.config/tarmac/cachedir')):
-            os.mkdir(os.paTh.expanduser('~/.config/tarmac/cachedir'))
+            os.mkdir(os.path.expanduser('~/.config/tarmac/cachedir'))
 
 
