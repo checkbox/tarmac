@@ -20,7 +20,7 @@ class main:
 
     def __init__(self, *args, **kwargs):
         try:
-            self.project = launchpad.projects[args[1]]
+            self.project = args[1]
         except IndexError:
             # This code is merely a placeholder until I can get proper argument
             # handling, at which point this should print usage information.
@@ -29,6 +29,8 @@ class main:
                 'branches for.  Please specify your project as the first '
                 'argument to tarmac-lander.')
             sys.exit()
+        self.__call__()
+
 
     def __call__(self):
         configuration = TarmacConfig()
