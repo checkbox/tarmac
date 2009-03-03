@@ -7,6 +7,19 @@ import unittest
 from tarmac.bin import TarmacLander
 
 
+class MockBMPComment:
+    '''A mock merge proposal comment.'''
+    title = 'This is a title.'
+    message_body = 'This is a comment.'
+
+
+def make_comment_list(count=5):
+    '''Make a list of comments.'''
+    comments = []
+    for i in range(0,count):
+        comments.append(MockBMPComment())
+    return comments
+
 class TestTarmacLander(unittest.TestCase):
     '''Tests for TarmacLander.'''
 
@@ -15,4 +28,27 @@ class TestTarmacLander(unittest.TestCase):
         sys.argv = ['foo', '--dry-run']
         script = TarmacLander()
         self.assertTrue(script.dry_run)
+
+    def test_find_commit_message_from_title(self):
+        '''Test getting a commit message from a title.'''
+        script = TarmacLander()
+        comments = make_comment_list()
+
+        comments[4].title = u'Commit message'
+        comments[4].message_body = u'All your base...'
+
+        commit_message = script._find_commit_message(comments)
+        self.assertEqual(commit_message, u'All your base...')
+
+    def test_find_commit_mesage_from_message_body(self):
+        '''Test getting a commit message from a message_body.'''
+        script = TarmacLander()
+        comments = make_comment_list()
+
+        comments[4].message_body = u'Commit message: I\'m in ur code.'
+
+        commit_message = script._find_commit_message(comments)
+        self.assertEqual(commit_message, u'I\'m in ur code.')
+
+
 
