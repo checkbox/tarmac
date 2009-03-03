@@ -75,18 +75,18 @@ class TarmacLander:
 
         for candidate in candidates:
 
-            temp_dir = '/tmp/merge-%(source)s-%(pid)s' % {
-                'source': candidate.source_branch.name,
-                'pid': os.getpid()
-                }
-            os.mkdir(temp_dir)
-
             commit_message = self._find_commit_message(candidate.all_comments)
             if self.dry_run:
                 print '%(source_branch)s - %(commit_message)s' % {
                     'source_branch': candidate.source_branch.bzr_identity,
                     'commit_message': commit_message}
                 continue
+
+            temp_dir = '/tmp/merge-%(source)s-%(pid)s' % {
+                'source': candidate.source_branch.name,
+                'pid': os.getpid()
+                }
+            os.mkdir(temp_dir)
 
             accelerator, target_branch = bzrdir.BzrDir.open_tree_or_branch(
                 candidate.target_branch.bzr_identity)
@@ -95,8 +95,8 @@ class TarmacLander:
             source_branch = branch.Branch.open(
                 candidate.source_branch.bzr_identity)
 
-            #target_tree.merge_from_branch(source_branch)
+            target_tree.merge_from_branch(source_branch)
             # TODO: Add hook code.
-            #target_tree.commit(candidate.all_comments[0].message_body)
+            target_tree.commit(candidate.all_comments[0].message_body)
 
 
