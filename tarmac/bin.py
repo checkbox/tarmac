@@ -31,6 +31,15 @@ class main:
             sys.exit()
         self.__call__()
 
+    def _find_commit_message(self, comments):
+        '''Find the proper commit comment.'''
+        for comment in comments:
+            if comment.title.lower().startswith('commit message'):
+                return comment.message_body
+            elif comment.message_body.lower().startswith('commit message: '):
+                return comment.message_body[len('Commit message: '):]
+        #TODO: Create a new exception for this
+        raise Exception
 
     def __call__(self):
         configuration = TarmacConfig()
@@ -58,6 +67,9 @@ class main:
                         if entry.queue_status == u'Approved']
 
         for candidate in candidates:
+            commit_message = self._find_commit_message(candidate.all_comments)
+            print commit_message
+            continue
             temp_dir = '/tmp/merge-%(source)s-%(pid)s' % {
                 'source': candidate.source_branch.name,
                 'pid': os.getpid()
