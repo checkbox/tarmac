@@ -5,6 +5,7 @@ import sys
 import unittest
 
 from tarmac.bin import TarmacLander
+from tarmac.exceptions import NoCommitMessage
 
 
 class MockBMPComment:
@@ -50,5 +51,13 @@ class TestTarmacLander(unittest.TestCase):
         commit_message = script._find_commit_message(comments)
         self.assertEqual(commit_message, u'I\'m in ur code.')
 
+    def test_find_commit_message_no_commit_message(self):
+        '''Test that _find_commit_message raises NoCommentFound.'''
+        script = TarmacLander()
+        comments = make_comment_list()
+
+        self.assertRaises(
+            NoCommitMessage,
+            script._find_commit_message, comments)
 
 
