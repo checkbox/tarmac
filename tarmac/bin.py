@@ -1,6 +1,6 @@
 # Copyright (c) 2009 - Paul Hummer
 '''Code used by Tarmac scripts.'''
-import optparse
+from optparse import OptionParser
 import os
 import sys
 
@@ -18,9 +18,17 @@ DEV_SERVICE_ROOT = 'https://api.launchpad.dev/beta/'
 class TarmacLander:
     '''Tarmac script.'''
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self):
+
+        parser = OptionParser()
+        parser.add_option('--dry-run', action='store_true', dest='dry_run',
+            help='Print out the branches that would be merged and their '
+                 'commit messages, but don\'t actually merge the branches.')
+        options, args = parser.parse_args()
+        self.dry_run = options.dry_run
+
         try:
-            self.project = args[1]
+            self.project = sys.argv[1]
         except IndexError:
             # This code is merely a placeholder until I can get proper argument
             # handling, at which point this should print usage information.
@@ -66,14 +74,19 @@ class TarmacLander:
                         if entry.queue_status == u'Approved']
 
         for candidate in candidates:
-            commit_message = self._find_commit_message(candidate.all_comments)
-            print commit_message
-            continue
+
             temp_dir = '/tmp/merge-%(source)s-%(pid)s' % {
                 'source': candidate.source_branch.name,
                 'pid': os.getpid()
                 }
             os.mkdir(temp_dir)
+
+            commit_message = self._find_commit_message(candidate.all_comments)
+            if self.dry_run:
+                print '%(source_branch)s - %(commit_message)s' % {
+                    'source_branch': candidate.source_branch.bzr_identity,
+                    'commit_message': commit_message}
+                continue
 
             accelerator, target_branch = bzrdir.BzrDir.open_tree_or_branch(
                 candidate.target_branch.bzr_identity)
@@ -82,9 +95,8 @@ class TarmacLander:
             source_branch = branch.Branch.open(
                 candidate.source_branch.bzr_identity)
 
-            target_tree.merge_from_branch(source_branch)
+            #target_tree.merge_from_branch(source_branch)
             # TODO: Add hook code.
-            target_tree.commit(candidate.all_comments[0].message_body)
-
+            #target_tree.commit(candidate.all_comments[0].message_body)
 
 

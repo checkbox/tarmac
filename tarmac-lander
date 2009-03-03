@@ -1,10 +1,8 @@
 # Copyright (c) 2009 - Paul Hummer
 #!/usr/bin/env python
-import sys
-
 from tarmac.bin import TarmacLander
 
 if __name__ == '__main__':
-    script = TarmacLander(*sys.argv)
+    script = TarmacLander()
     script.main()
 
