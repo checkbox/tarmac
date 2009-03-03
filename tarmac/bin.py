@@ -9,6 +9,7 @@ from bzrlib.plugin import load_plugins
 from launchpadlib.errors import HTTPError
 
 from tarmac.config import TarmacConfig
+from tarmac.exceptions import NoCommitMessage
 from tarmac.utils import get_launchpad_object
 
 load_plugins()
@@ -45,8 +46,7 @@ class TarmacLander:
                 return comment.message_body
             elif comment.message_body.lower().startswith('commit message: '):
                 return comment.message_body[len('Commit message: '):]
-        #TODO: Create a new exception for this
-        raise Exception
+        raise NoCommitMessage
 
     def main(self):
         configuration = TarmacConfig()
