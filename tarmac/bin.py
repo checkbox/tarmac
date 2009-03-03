@@ -15,7 +15,7 @@ load_plugins()
 DEV_SERVICE_ROOT = 'https://api.launchpad.dev/beta/'
 
 
-class main:
+class TarmacLander:
     '''Tarmac script.'''
 
     def __init__(self, *args, **kwargs):
@@ -29,7 +29,6 @@ class main:
                 'branches for.  Please specify your project as the first '
                 'argument to tarmac-lander.')
             sys.exit()
-        self.__call__()
 
     def _find_commit_message(self, comments):
         '''Find the proper commit comment.'''
@@ -41,7 +40,7 @@ class main:
         #TODO: Create a new exception for this
         raise Exception
 
-    def __call__(self):
+    def main(self):
         configuration = TarmacConfig()
 
         try:
