@@ -21,14 +21,21 @@ def make_comment_list(count=5):
         comments.append(MockBMPComment())
     return comments
 
+
 class TestTarmacLander(unittest.TestCase):
     '''Tests for TarmacLander.'''
 
     def test_lander_dry_run(self):
         '''Test that setting --dry-run sets the dry_run property.'''
-        sys.argv = ['foo', '--dry-run']
+        sys.argv = ['', 'foo', '--dry-run']
         script = TarmacLander()
         self.assertTrue(script.dry_run)
+
+    def test_lander_project(self):
+        '''Test that the project argument gets handled properly.'''
+        sys.argv = ['', 'foo']
+        script = TarmacLander()
+        self.assertEqual(script.project, u'foo')
 
     def test_find_commit_message_from_title(self):
         '''Test getting a commit message from a title.'''
