@@ -1,6 +1,7 @@
 # Copyright (c) 2009 - Paul Hummer
 '''Tests for Tarmac scripts.'''
-import os
+__metaclass__ = type
+
 import sys
 import unittest
 
@@ -10,15 +11,17 @@ from tarmac.exceptions import NoCommitMessage
 
 class MockBMPComment:
     '''A mock merge proposal comment.'''
-    title = 'This is a title.'
-    message_body = 'This is a comment.'
+
+    def __init__(self, _id):
+        title = 'This is a title %s.' % _id
+        message_body = 'This is a comment %s.' % _id
 
 
 def make_comment_list(count=5):
     '''Make a list of comments.'''
     comments = []
-    for i in range(0,count):
-        comments.append(MockBMPComment())
+    for i in range(0, count):
+        comments.append(MockBMPComment(i))
     return comments
 
 

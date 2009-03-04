@@ -25,7 +25,7 @@ class TarmacLander:
         parser.add_option('--dry-run', action='store_true', dest='dry_run',
             help='Print out the branches that would be merged and their '
                  'commit messages, but don\'t actually merge the branches.')
-        options, args = parser.parse_args()
+        options = parser.parse_args()[0]
         self.dry_run = options.dry_run
 
         try:

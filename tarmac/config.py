@@ -1,7 +1,6 @@
 # Copyright (c) 2009 - Paul Hummer
 '''Configuration handler.'''
 # pylint: disable-msg=C0103
-from ConfigParser import SafeConfigParser as ConfigParser
 import os
 
 
