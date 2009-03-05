@@ -22,11 +22,14 @@ class TarmacLander:
     def __init__(self):
 
         parser = OptionParser("%prog [options] <projectname>")
-        parser.add_option('--dry-run', action='store_true', dest='dry_run',
+        parser.add_option('--dry-run', action='store_true',
             help='Print out the branches that would be merged and their '
                  'commit messages, but don\'t actually merge the branches.')
+        parser.add_option('--test-command', type='string', default='make test',
+            help='The test command to run after merging a branch.')
         options, args = parser.parse_args()
         self.dry_run = options.dry_run
+        self.test_command = options.test_command
 
         if len(args) != 1:
             # This code is merely a placeholder until I can get proper argument
