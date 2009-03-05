@@ -27,7 +27,9 @@ class TarmacLander:
             help='Print out the branches that would be merged and their '
                  'commit messages, but don\'t actually merge the branches.')
         parser.add_option('--test-command', type='string', default='make test',
-            help='The test command to run after merging a branch.')
+            metavar='TEST',
+            help='The test command to run after merging a branch [default: '
+                  '%default].')
         options, args = parser.parse_args()
         self.dry_run = options.dry_run
         self.test_command = options.test_command
