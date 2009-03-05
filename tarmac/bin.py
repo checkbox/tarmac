@@ -93,6 +93,6 @@ class TarmacLander:
 
             target_tree.merge_from_branch(source_branch)
             # TODO: Add hook code.
-            target_tree.commit(candidate.all_comments[0].message_body)
+            target_tree.commit(commit_message)
 
 
