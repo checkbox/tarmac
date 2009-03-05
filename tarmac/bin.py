@@ -103,7 +103,6 @@ class TarmacLander:
             if retcode == 0:
                 # TODO: It would be very nice if the commit message included
                 # some reference to the people who voted approve.
-                print 'would have committed'
-                #target_tree.commit(commit_message)
+                target_tree.commit(commit_message)
             else:
                 target_tree.revert()
