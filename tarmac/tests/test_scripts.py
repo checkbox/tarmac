@@ -13,8 +13,8 @@ class MockBMPComment:
     '''A mock merge proposal comment.'''
 
     def __init__(self, _id):
-        title = 'This is a title %s.' % _id
-        message_body = 'This is a comment %s.' % _id
+        self.title = u'This is a title %s.' % _id
+        self.message_body = u'This is a comment %s.' % _id
 
 
 def make_comment_list(count=5):
