@@ -2,6 +2,7 @@
 '''Code used by Tarmac scripts.'''
 from optparse import OptionParser
 import os
+import subprocess
 import sys
 
 from bzrlib import branch, bzrdir
@@ -22,11 +23,14 @@ class TarmacLander:
     def __init__(self):
 
         parser = OptionParser("%prog [options] <projectname>")
-        parser.add_option('--dry-run', action='store_true', dest='dry_run',
+        parser.add_option('--dry-run', action='store_true',
             help='Print out the branches that would be merged and their '
                  'commit messages, but don\'t actually merge the branches.')
+        parser.add_option('--test-command', type='string', default='make test',
+            help='The test command to run after merging a branch.')
         options, args = parser.parse_args()
         self.dry_run = options.dry_run
+        self.test_command = options.test_command
 
         if len(args) != 1:
             # This code is merely a placeholder until I can get proper argument
@@ -92,7 +96,13 @@ class TarmacLander:
                 candidate.source_branch.bzr_identity)
 
             target_tree.merge_from_branch(source_branch)
-            # TODO: Add hook code.
-            target_tree.commit(commit_message)
-
-
+            cwd = os.getcwd()
+            os.chdir(temp_dir)
+            retcode = subprocess.call(self.test_command, shell=True)
+            os.chdir(cwd)
+            if retcode == 0:
+                # TODO: It would be very nice if the commit message included
+                # some reference to the people who voted approve.
+                target_tree.commit(commit_message)
+            else:
+                target_tree.revert()
