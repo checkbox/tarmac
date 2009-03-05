@@ -96,7 +96,10 @@ class TarmacLander:
                 candidate.source_branch.bzr_identity)
 
             target_tree.merge_from_branch(source_branch)
+            cwd = os.getcwd()
+            os.chdir(temp_dir)
             retcode = subprocess.call(self.test_command, shell=True)
+            os.chdir(cwd)
             if retcode == 0:
                 # TODO: It would be very nice if the commit message included
                 # some reference to the people who voted approve.
