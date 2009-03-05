@@ -1,5 +1,5 @@
-# Copyright (c) 2009 - Paul Hummer
 #!/usr/bin/env python
+# Copyright (c) 2009 - Paul Hummer
 from tarmac.bin import TarmacLander
 
 if __name__ == '__main__':

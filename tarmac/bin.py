@@ -21,23 +21,19 @@ class TarmacLander:
 
     def __init__(self):
 
-        parser = OptionParser()
+        parser = OptionParser("%prog [options] <projectname>")
         parser.add_option('--dry-run', action='store_true', dest='dry_run',
             help='Print out the branches that would be merged and their '
                  'commit messages, but don\'t actually merge the branches.')
-        options = parser.parse_args()[0]
+        options, args = parser.parse_args()
         self.dry_run = options.dry_run
 
-        try:
-            self.project = sys.argv[1]
-        except IndexError:
+        if len(args) != 1:
             # This code is merely a placeholder until I can get proper argument
             # handling, at which point this should print usage information.
-            print (
-                'Oops!  You\'ve forgotten to specify a project to land '
-                'branches for.  Please specify your project as the first '
-                'argument to tarmac-lander.')
-            sys.exit()
+            parser.error("Please specify a project name.")
+
+        self.project, = args
 
     def _find_commit_message(self, comments):
         '''Find the proper commit comment.'''
