@@ -2,6 +2,7 @@
 '''Code used by Tarmac scripts.'''
 from optparse import OptionParser
 import os
+import subprocess
 import sys
 
 from bzrlib import branch, bzrdir
@@ -95,7 +96,12 @@ class TarmacLander:
                 candidate.source_branch.bzr_identity)
 
             target_tree.merge_from_branch(source_branch)
-            # TODO: Add hook code.
-            target_tree.commit(candidate.all_comments[0].message_body)
+            retcode = subprocess.call(self.test_command, shell=True)
+            if retcode == 0:
+                # TODO: It would be very nice if the commit message included
+                # some reference to the people who voted approve.
+                target_tree.commit(candidate.all_comments[0].message_body)
+            else:
+                target_tree.revert()
 
 
