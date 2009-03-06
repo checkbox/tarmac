@@ -18,7 +18,7 @@ class TarmacConfig:
         self.CONFIG = os.path.join(self.CONFIG_HOME, 'config')
         self.CREDENTIALS = os.path.join(self.CONFIG_HOME, 'credentials')
 
-        self.CACHEDIR = '/tmp/tarmac-cache-%(pid)s' % {'pid': os.getpid()}
+        self.CACHEDIR = os.path.join(self.CONFIG_HOME, 'cachedir')
 
         self._check_config_dirs()
 
