@@ -15,7 +15,7 @@ class TarmacConfig:
         config.
         '''
         self.CONFIG_HOME = os.path.expanduser('~/.config/tarmac')
-        self.CONFIG = os.path.join(self.CONFIG_HOME, 'config')
+        self.CONFIG_FILE = os.path.join(self.CONFIG_HOME, 'tarmac.conf')
         self.CREDENTIALS = os.path.join(self.CONFIG_HOME, 'credentials')
 
         self.CACHEDIR = os.path.join(self.CONFIG_HOME, 'cachedir')
