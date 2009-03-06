@@ -33,8 +33,6 @@ class TarmacLander:
         self.test_command = options.test_command
 
         if len(args) != 1:
-            # This code is merely a placeholder until I can get proper argument
-            # handling, at which point this should print usage information.
             parser.error("Please specify a project name.")
 
         self.project, = args
