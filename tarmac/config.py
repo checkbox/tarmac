@@ -21,10 +21,11 @@ class TarmacConfig:
         self.CACHEDIR = os.path.join(self.CONFIG_HOME, 'cachedir')
 
         self._check_config_dirs()
-        self.SECTION = section
         self._CONFIG_FILE = os.path.join(self.CONFIG_HOME, 'tarmac.conf')
         self._CONFIG = ConfigParser()
         self._CONFIG.read(self._CONFIG_FILE)
+        if self._CONFIG.has_section(section):
+            self._SECTION = section
 
     def _check_config_dirs(self):
         '''Create the configuration directory if it doesn't exist.'''
@@ -34,5 +35,9 @@ class TarmacConfig:
             os.mkdir(os.path.expanduser('~/.config/tarmac'))
         if not os.path.exists(os.path.expanduser('~/.config/tarmac/cachedir')):
             os.mkdir(os.path.expanduser('~/.config/tarmac/cachedir'))
+
+    def get(self, key):
+        '''Get a config value for the given key.'''
+        return self._CONFIG.get(self._SECTION, key);
 
 

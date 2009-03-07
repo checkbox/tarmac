@@ -37,6 +37,9 @@ class TarmacLander:
 
         self.project, = args
 
+        configuration = TarmacConfig()
+
+
     def _find_commit_message(self, comments):
         '''Find the proper commit comment.'''
         for comment in comments:
@@ -47,7 +50,6 @@ class TarmacLander:
         raise NoCommitMessage
 
     def main(self):
-        configuration = TarmacConfig()
 
         try:
             launchpad = get_launchpad_object(configuration)
