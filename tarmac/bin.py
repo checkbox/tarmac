@@ -81,8 +81,13 @@ class TarmacLander:
         for candidate in candidates:
 
             try:
-                commit_message = self._find_commit_message(
+                commit_dict = {}
+                commit_dict['commit_line'] = self._find_commit_message(
                     candidate.all_comments)
+                commit_dict['reviewers'] = self._get_reviewers(candidate)
+                commit_message = (
+                    '[Reviewed by: %(reviewers)s] %(commit_line)s' %
+                    commit_dict)
             except NoCommitMessage:
                 print ('Proposal to merge %(branch_name)s is missing '
                     'an associated commit message.  As a result, '
@@ -118,11 +123,14 @@ class TarmacLander:
                 retcode = subprocess.call(self.test_command, shell=True)
                 os.chdir(cwd)
                 if retcode == 0:
-                    # TODO: It would be very nice if the commit message
-                    # included some reference to the people who voted
-                    # approve.
                     target_tree.commit(commit_message)
                 else:
                     target_tree.revert()
             else:
                 target_tree.commit(commit_message)
+
+    def _get_reviewers(self, candidate):
+        '''Get all reviewers who approved the review.'''
+        return [comment.reviewer for comment in candidate.all_comments
+            if comment.vote == u'Approve'].join(', ')
+
