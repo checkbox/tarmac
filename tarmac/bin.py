@@ -4,6 +4,7 @@ from optparse import OptionParser
 import os
 import subprocess
 import sys
+import warnings
 
 from bzrlib import branch, bzrdir
 from bzrlib.plugin import load_plugins
@@ -79,7 +80,18 @@ class TarmacLander:
 
         for candidate in candidates:
 
-            commit_message = self._find_commit_message(candidate.all_comments)
+            try:
+                commit_message = self._find_commit_message(
+                    candidate.all_comments)
+            except NoCommitMessage:
+                print ('Proposal to merge %(branch_name)s is missing '
+                    'an associated commit message.  As a result, '
+                    'the branch will not be merged.' % {
+                    'branch_name': candidate.source_branch.bzr_identity})
+                print
+                continue
+
+
             if self.dry_run:
                 print '%(source_branch)s - %(commit_message)s' % {
                     'source_branch': candidate.source_branch.bzr_identity,
