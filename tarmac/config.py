@@ -2,6 +2,7 @@
 '''Configuration handler.'''
 # pylint: disable-msg=C0103
 import os
+from ConfigParser import SafeConfigParser as ConfigParser
 
 
 class TarmacConfig:
@@ -15,12 +16,15 @@ class TarmacConfig:
         config.
         '''
         self.CONFIG_HOME = os.path.expanduser('~/.config/tarmac')
-        self.CONFIG_FILE = os.path.join(self.CONFIG_HOME, 'tarmac.conf')
         self.CREDENTIALS = os.path.join(self.CONFIG_HOME, 'credentials')
 
         self.CACHEDIR = os.path.join(self.CONFIG_HOME, 'cachedir')
 
         self._check_config_dirs()
+        self.SECTION = section
+        self._CONFIG_FILE = os.path.join(self.CONFIG_HOME, 'tarmac.conf')
+        self._CONFIG = ConfigParser()
+        self._CONFIG.read(self._CONFIG_FILE)
 
     def _check_config_dirs(self):
         '''Create the configuration directory if it doesn't exist.'''
