@@ -41,7 +41,8 @@ class TarmacConfig:
         '''Get the test_command from the stored config.'''
         return self.get('test_command')
 
-    @property commit_string(self):
+    @property
+    def commit_string(self):
         '''Get the commit_string from the stored config.'''
         return self.get('commit_string')
 
