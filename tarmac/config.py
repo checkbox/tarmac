@@ -2,6 +2,7 @@
 '''Configuration handler.'''
 # pylint: disable-msg=C0103
 import os
+from ConfigParser import NoSectionError
 from ConfigParser import SafeConfigParser as ConfigParser
 
 
@@ -24,8 +25,7 @@ class TarmacConfig:
         self._CONFIG_FILE = os.path.join(self.CONFIG_HOME, 'tarmac.conf')
         self._CONFIG = ConfigParser()
         self._CONFIG.read(self._CONFIG_FILE)
-        if self._CONFIG.has_section(section):
-            self._SECTION = section
+        self._SECTION = section
 
     def _check_config_dirs(self):
         '''Create the configuration directory if it doesn't exist.'''
@@ -38,6 +38,9 @@ class TarmacConfig:
 
     def get(self, key):
         '''Get a config value for the given key.'''
-        return self._CONFIG.get(self._SECTION, key);
+        try:
+            return self._CONFIG.get(self._SECTION, key);
+        except (NoOptionError, NoSectionError):
+            return None
 
 

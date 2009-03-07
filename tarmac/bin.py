@@ -30,7 +30,6 @@ class TarmacLander:
             help='The test command to run after merging a branch.')
         options, args = parser.parse_args()
         self.dry_run = options.dry_run
-        self.test_command = options.test_command
 
         if len(args) != 1:
             parser.error("Please specify a project name.")
@@ -38,6 +37,12 @@ class TarmacLander:
         self.project, = args
         self.configuration = TarmacConfig(self.project)
 
+        if options.test_command:
+            self.test_command = options.test_command
+        elif self.configuration.get('test_command'):
+            self.test_command = self.configuration.get('test_command')
+        else:
+            self.test_command = None
 
     def _find_commit_message(self, comments):
         '''Find the proper commit comment.'''
@@ -95,13 +100,17 @@ class TarmacLander:
                 candidate.source_branch.bzr_identity)
 
             target_tree.merge_from_branch(source_branch)
-            cwd = os.getcwd()
-            os.chdir(temp_dir)
-            retcode = subprocess.call(self.test_command, shell=True)
-            os.chdir(cwd)
-            if retcode == 0:
-                # TODO: It would be very nice if the commit message included
-                # some reference to the people who voted approve.
-                target_tree.commit(commit_message)
+            if self.test_command:
+                cwd = os.getcwd()
+                os.chdir(temp_dir)
+                retcode = subprocess.call(self.test_command, shell=True)
+                os.chdir(cwd)
+                if retcode == 0:
+                    # TODO: It would be very nice if the commit message
+                    # included some reference to the people who voted
+                    # approve.
+                    target_tree.commit(commit_message)
+                else:
+                    target_tree.revert()
             else:
-                target_tree.revert()
+                target_tree.commit(commit_message)
