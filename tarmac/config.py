@@ -2,7 +2,7 @@
 '''Configuration handler.'''
 # pylint: disable-msg=C0103
 import os
-from ConfigParser import NoSectionError
+from ConfigParser import NoSectionError, NoOptionError
 from ConfigParser import SafeConfigParser as ConfigParser
 
 
