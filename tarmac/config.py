@@ -49,7 +49,7 @@ class TarmacConfig:
     def get(self, key):
         '''Get a config value for the given key.'''
         try:
-            return self._CONFIG.get(self._SECTION, key);
+            return self._CONFIG.get(self._SECTION, key)
         except (NoOptionError, NoSectionError):
             return None
 

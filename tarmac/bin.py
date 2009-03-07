@@ -4,7 +4,6 @@ from optparse import OptionParser
 import os
 import subprocess
 import sys
-import warnings
 
 from bzrlib import branch, bzrdir
 from bzrlib.plugin import load_plugins
@@ -55,6 +54,7 @@ class TarmacLander:
         raise NoCommitMessage
 
     def main(self):
+        '''Execute the script.'''
 
         try:
             launchpad = get_launchpad_object(self.configuration)
