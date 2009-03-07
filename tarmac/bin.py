@@ -39,8 +39,8 @@ class TarmacLander:
 
         if options.test_command:
             self.test_command = options.test_command
-        elif self.configuration.get('test_command'):
-            self.test_command = self.configuration.get('test_command')
+        elif self.configuration.test_command:
+            self.test_command = self.configuration.test_command
         else:
             self.test_command = None
 

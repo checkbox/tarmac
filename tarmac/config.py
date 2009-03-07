@@ -36,6 +36,11 @@ class TarmacConfig:
         if not os.path.exists(os.path.expanduser('~/.config/tarmac/cachedir')):
             os.mkdir(os.path.expanduser('~/.config/tarmac/cachedir'))
 
+    @property
+    def test_command(self):
+        '''Get the test_command from the stored config.'''
+        return self._CONFIG.get(self._SECTION, 'test_command')
+
     def get(self, key):
         '''Get a config value for the given key.'''
         try:
