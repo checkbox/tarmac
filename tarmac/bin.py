@@ -26,7 +26,7 @@ class TarmacLander:
         parser.add_option('--dry-run', action='store_true',
             help='Print out the branches that would be merged and their '
                  'commit messages, but don\'t actually merge the branches.')
-        parser.add_option('--test-command', type='string', default='make test',
+        parser.add_option('--test-command', type='string', default=None,
             help='The test command to run after merging a branch.')
         options, args = parser.parse_args()
         self.dry_run = options.dry_run
@@ -36,8 +36,7 @@ class TarmacLander:
             parser.error("Please specify a project name.")
 
         self.project, = args
-
-        configuration = TarmacConfig()
+        self.configuration = TarmacConfig(self.project)
 
 
     def _find_commit_message(self, comments):
@@ -52,12 +51,12 @@ class TarmacLander:
     def main(self):
 
         try:
-            launchpad = get_launchpad_object(configuration)
+            launchpad = get_launchpad_object(self.configuration)
         except HTTPError:
             print (
                 'Oops!  It appears that the OAuth token is invalid.  Please '
                 'delete %(credential_file)s and re-authenticate.' %
-                    {'credential_file': configuration.CREDENTIALS})
+                    {'credential_file': self.configuration.CREDENTIALS})
             sys.exit()
 
         project = launchpad.projects[self.project]
