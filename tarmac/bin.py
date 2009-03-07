@@ -85,9 +85,12 @@ class TarmacLander:
                 commit_dict['commit_line'] = self._find_commit_message(
                     candidate.all_comments)
                 commit_dict['reviewers'] = self._get_reviewers(candidate)
-                commit_message = (
-                    '[Reviewed by: %(reviewers)s] %(commit_line)s' %
-                    commit_dict)
+                if self.configuration.commit_string:
+                    commit_string = self.configuration.commit_string
+                else:
+                    commit_string = (
+                        '[Reviewed by: %(reviewers)s] %(commit_line)s')
+                commit_message = commit_string % commit_dict
             except NoCommitMessage:
                 print ('Proposal to merge %(branch_name)s is missing '
                     'an associated commit message.  As a result, '
