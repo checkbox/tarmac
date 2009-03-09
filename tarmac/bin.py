@@ -84,12 +84,14 @@ class TarmacLander:
                 commit_dict = {}
                 commit_dict['commit_line'] = self._find_commit_message(
                     candidate.all_comments)
-                commit_dict['reviewers'] = self._get_reviewers(candidate)
+                # This is a great idea, but apparently reviewer isn't exposed
+                # in the API just yet.
+                #commit_dict['reviewers'] = self._get_reviewers(candidate)
+
                 if self.configuration.commit_string:
                     commit_string = self.configuration.commit_string
                 else:
-                    commit_string = (
-                        '[Reviewed by: %(reviewers)s] %(commit_line)s')
+                    commit_string = ('%(commit_line)s')
                 commit_message = commit_string % commit_dict
             except NoCommitMessage:
                 print ('Proposal to merge %(branch_name)s is missing '
