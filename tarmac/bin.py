@@ -106,7 +106,6 @@ class TarmacLander:
                 print '%(source_branch)s - %(commit_message)s' % {
                     'source_branch': candidate.source_branch.bzr_identity,
                     'commit_message': commit_message}
-                continue
 
             temp_dir = '/tmp/merge-%(source)s-%(pid)s' % {
                 'source': candidate.source_branch.name,
@@ -128,11 +127,17 @@ class TarmacLander:
                 retcode = subprocess.call(self.test_command, shell=True)
                 os.chdir(cwd)
                 if retcode == 0:
-                    target_tree.commit(commit_message)
+                    if not self.dry_run:
+                        target_tree.commit(commit_message)
+                    else:
+                        print 'Branch passed test command'
                 else:
+                    if self.dry_run:
+                        print 'Branch failed test command'
                     target_tree.revert()
             else:
-                target_tree.commit(commit_message)
+                if not self.dry_run:
+                    target_tree.commit(commit_message)
 
     def _get_reviewers(self, candidate):
         '''Get all reviewers who approved the review.'''
