@@ -26,20 +26,24 @@ class TarmacLander:
         parser.add_option('--dry-run', action='store_true',
             help='Print out the branches that would be merged and their '
                  'commit messages, but don\'t actually merge the branches.')
-        parser.add_option('--test-command', type='string', default='make test',
+        parser.add_option('--test-command', type='string', default=None,
             metavar='TEST',
-            help='The test command to run after merging a branch [default: '
-                  '%default].')
+            help='The test command to run after merging a branch.')
         options, args = parser.parse_args()
         self.dry_run = options.dry_run
-        self.test_command = options.test_command
 
         if len(args) != 1:
-            # This code is merely a placeholder until I can get proper argument
-            # handling, at which point this should print usage information.
             parser.error("Please specify a project name.")
 
         self.project, = args
+        self.configuration = TarmacConfig(self.project)
+
+        if options.test_command:
+            self.test_command = options.test_command
+        elif self.configuration.test_command:
+            self.test_command = self.configuration.test_command
+        else:
+            self.test_command = None
 
     def _find_commit_message(self, comments):
         '''Find the proper commit comment.'''
@@ -51,15 +55,15 @@ class TarmacLander:
         raise NoCommitMessage
 
     def main(self):
-        configuration = TarmacConfig()
+        '''Execute the script.'''
 
         try:
-            launchpad = get_launchpad_object(configuration)
+            launchpad = get_launchpad_object(self.configuration)
         except HTTPError:
             print (
                 'Oops!  It appears that the OAuth token is invalid.  Please '
                 'delete %(credential_file)s and re-authenticate.' %
-                    {'credential_file': configuration.CREDENTIALS})
+                    {'credential_file': self.configuration.CREDENTIALS})
             sys.exit()
 
         project = launchpad.projects[self.project]
@@ -77,12 +81,32 @@ class TarmacLander:
 
         for candidate in candidates:
 
-            commit_message = self._find_commit_message(candidate.all_comments)
+            try:
+                commit_dict = {}
+                commit_dict['commit_line'] = self._find_commit_message(
+                    candidate.all_comments)
+                # This is a great idea, but apparently reviewer isn't exposed
+                # in the API just yet.
+                #commit_dict['reviewers'] = self._get_reviewers(candidate)
+
+                if self.configuration.commit_string:
+                    commit_string = self.configuration.commit_string
+                else:
+                    commit_string = ('%(commit_line)s')
+                commit_message = commit_string % commit_dict
+            except NoCommitMessage:
+                print ('Proposal to merge %(branch_name)s is missing '
+                    'an associated commit message.  As a result, '
+                    'the branch will not be merged.' % {
+                    'branch_name': candidate.source_branch.bzr_identity})
+                print
+                continue
+
+
             if self.dry_run:
                 print '%(source_branch)s - %(commit_message)s' % {
                     'source_branch': candidate.source_branch.bzr_identity,
                     'commit_message': commit_message}
-                continue
 
             temp_dir = '/tmp/merge-%(source)s-%(pid)s' % {
                 'source': candidate.source_branch.name,
@@ -98,15 +122,26 @@ class TarmacLander:
                 candidate.source_branch.bzr_identity)
 
             target_tree.merge_from_branch(source_branch)
-            cwd = os.getcwd()
-            os.chdir(temp_dir)
-            retcode = subprocess.call(self.test_command, shell=True)
-            os.chdir(cwd)
-            if retcode == 0:
-                # TODO: It would be very nice if the commit message included
-                # some reference to the people who voted approve.
-                print '%s succeeded, committing.' % self.test_command
-                target_tree.commit(commit_message)
+            if self.test_command:
+                cwd = os.getcwd()
+                os.chdir(temp_dir)
+                retcode = subprocess.call(self.test_command, shell=True)
+                os.chdir(cwd)
+                if retcode == 0:
+                    if not self.dry_run:
+                        target_tree.commit(commit_message)
+                    else:
+                        print 'Branch passed test command'
+                else:
+                    if self.dry_run:
+                        print 'Branch failed test command'
+                    target_tree.revert()
             else:
-                print '%s failed, reverting.' % self.test_command
-                target_tree.revert()
+                if not self.dry_run:
+                    target_tree.commit(commit_message)
+
+    def _get_reviewers(self, candidate):
+        '''Get all reviewers who approved the review.'''
+        return [comment.reviewer for comment in candidate.all_comments
+            if comment.vote == u'Approve'].join(', ')
+

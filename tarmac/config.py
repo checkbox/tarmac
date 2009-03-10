@@ -2,6 +2,8 @@
 '''Configuration handler.'''
 # pylint: disable-msg=C0103
 import os
+from ConfigParser import NoSectionError, NoOptionError
+from ConfigParser import SafeConfigParser as ConfigParser
 
 
 class TarmacConfig:
@@ -15,12 +17,15 @@ class TarmacConfig:
         config.
         '''
         self.CONFIG_HOME = os.path.expanduser('~/.config/tarmac')
-        self.CONFIG = os.path.join(self.CONFIG_HOME, 'config')
         self.CREDENTIALS = os.path.join(self.CONFIG_HOME, 'credentials')
 
-        self.CACHEDIR = '/tmp/tarmac-cache-%(pid)s' % {'pid': os.getpid()}
+        self.CACHEDIR = os.path.join(self.CONFIG_HOME, 'cachedir')
 
         self._check_config_dirs()
+        self._CONFIG_FILE = os.path.join(self.CONFIG_HOME, 'tarmac.conf')
+        self._CONFIG = ConfigParser()
+        self._CONFIG.read(self._CONFIG_FILE)
+        self._SECTION = section
 
     def _check_config_dirs(self):
         '''Create the configuration directory if it doesn't exist.'''
@@ -30,5 +35,22 @@ class TarmacConfig:
             os.mkdir(os.path.expanduser('~/.config/tarmac'))
         if not os.path.exists(os.path.expanduser('~/.config/tarmac/cachedir')):
             os.mkdir(os.path.expanduser('~/.config/tarmac/cachedir'))
+
+    @property
+    def test_command(self):
+        '''Get the test_command from the stored config.'''
+        return self.get('test_command')
+
+    @property
+    def commit_string(self):
+        '''Get the commit_string from the stored config.'''
+        return self.get('commit_string')
+
+    def get(self, key):
+        '''Get a config value for the given key.'''
+        try:
+            return self._CONFIG.get(self._SECTION, key)
+        except (NoOptionError, NoSectionError):
+            return None
 
 
