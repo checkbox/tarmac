@@ -58,6 +58,11 @@ class TarmacLander:
                 continue
         raise NoCommitMessage
 
+    def _get_reviewers(self, candidate):
+        '''Get all reviewers who approved the review.'''
+        return [comment.reviewer for comment in candidate.all_comments
+            if comment.vote == u'Approve'].join(', ')
+
     def main(self):
         '''Execute the script.'''
 
@@ -144,8 +149,4 @@ class TarmacLander:
                 if not self.dry_run:
                     target_tree.commit(commit_message)
 
-    def _get_reviewers(self, candidate):
-        '''Get all reviewers who approved the review.'''
-        return [comment.reviewer for comment in candidate.all_comments
-            if comment.vote == u'Approve'].join(', ')
 
