@@ -45,13 +45,17 @@ class TarmacLander:
         else:
             self.test_command = None
 
-    def _find_commit_message(self, comments):
+    def _find_commit_message(self, candidate):
         '''Find the proper commit comment.'''
-        for comment in comments:
-            if comment.title.lower().startswith('commit message'):
-                return comment.message_body
-            elif comment.message_body.lower().startswith('commit message: '):
-                return comment.message_body[len('Commit message: '):]
+        for comment in candidate.all_comments:
+            try:
+                if comment.title.lower().startswith('commit message'):
+                    return comment.message_body
+                elif comment.message_body.lower().startswith(
+                                                        'commit message: '):
+                    return comment.message_body[len('Commit message: '):]
+            except AttributeError:
+                continue
         raise NoCommitMessage
 
     def main(self):
@@ -84,7 +88,7 @@ class TarmacLander:
             try:
                 commit_dict = {}
                 commit_dict['commit_line'] = self._find_commit_message(
-                    candidate.all_comments)
+                    candidate)
                 # This is a great idea, but apparently reviewer isn't exposed
                 # in the API just yet.
                 #commit_dict['reviewers'] = self._get_reviewers(candidate)
