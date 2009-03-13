@@ -1,5 +1,6 @@
 # Copyright (c) 2009 - Paul Hummer
 '''Tests for Tarmac scripts.'''
+# pylint: disable-msg=W0212
 __metaclass__ = type
 
 import sys
