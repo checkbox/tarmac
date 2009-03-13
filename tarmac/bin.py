@@ -47,6 +47,12 @@ class TarmacLander:
 
     def _find_commit_message(self, candidate):
         '''Find the proper commit comment.'''
+        # Currently, commit_message isn't editable through the Web UI, so it's
+        # not practical to use it, but when it is, it will not only be
+        # practical, but this method will just go away completely.
+        #if candidate.commit_message:
+        #    return candidate.commit_message
+
         for comment in candidate.all_comments:
             try:
                 if comment.title.lower().startswith('commit message'):
