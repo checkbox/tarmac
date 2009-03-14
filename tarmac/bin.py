@@ -2,6 +2,7 @@
 '''Code used by Tarmac scripts.'''
 from optparse import OptionParser
 import os
+from shutil import rmtree
 import subprocess
 import sys
 
@@ -94,6 +95,15 @@ class TarmacLander:
         candidates = [entry for entry in trunk.landing_candidates
                         if entry.queue_status == u'Approved']
 
+        temp_dir = os.path.join('/tmp', self.project)
+        if os.path.exists(temp_dir):
+            rmtree(temp_dir)
+        os.mkdir(temp_dir)
+        accelerator, target_branch = bzrdir.BzrDir.open_tree_or_branch(
+            trunk.bzr_identity)
+        target_tree = target_branch.create_checkout(
+            temp_dir, None, True, accelerator)
+
         for candidate in candidates:
 
             try:
@@ -123,16 +133,6 @@ class TarmacLander:
                     'source_branch': candidate.source_branch.bzr_identity,
                     'commit_message': commit_message}
 
-            temp_dir = '/tmp/merge-%(source)s-%(pid)s' % {
-                'source': candidate.source_branch.name,
-                'pid': os.getpid()
-                }
-            os.mkdir(temp_dir)
-
-            accelerator, target_branch = bzrdir.BzrDir.open_tree_or_branch(
-                candidate.target_branch.bzr_identity)
-            target_tree = target_branch.create_checkout(
-                temp_dir, None, True, accelerator)
             source_branch = branch.Branch.open(
                 candidate.source_branch.bzr_identity)
 
@@ -154,5 +154,6 @@ class TarmacLander:
             else:
                 if not self.dry_run:
                     target_tree.commit(commit_message)
+            target_tree.revert()
 
 
