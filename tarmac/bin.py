@@ -145,11 +145,10 @@ class TarmacLander:
                     if self.dry_run:
                         print 'Branch failed test command'
                     target_tree.revert()
-                    comment = '\n'.join(['Branch failed test command',
-                        stdout_value, stderr_value])
-                    candidate.createComment(subject="unused", content=comment,
-                                            vote='Needs Fixing')
-                    candidate.queue_status = 'Needs Fixing'
+                    comment = u'\n'.join([stdout_value, stderr_value])
+                    candidate.createComment(subject="Failed test command",
+                                            content=comment)
+                    candidate.queue_status = u'Needs review'
                     candidate.lp_save()
             else:
                 if not self.dry_run:
