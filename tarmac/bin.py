@@ -139,7 +139,12 @@ class TarmacLander:
             if self.test_command:
                 cwd = os.getcwd()
                 os.chdir(temp_dir)
-                retcode = subprocess.call(self.test_command, shell=True)
+                proc = subprocess.Popen(self.test_command,
+                                        shell=True,
+                                        stdout=subprocess.PIPE,
+                                        stderr=subprocess.PIPE)
+                stdout_value, stderr_value = proc.communicate()
+                retcode = proc.wait()
                 os.chdir(cwd)
                 if retcode == 0:
                     if not self.dry_run:
@@ -150,6 +155,11 @@ class TarmacLander:
                     if self.dry_run:
                         print 'Branch failed test command'
                     target_tree.revert()
+                    comment = u'\n'.join([stdout_value, stderr_value])
+                    candidate.createComment(subject="Failed test command",
+                                            content=comment)
+                    candidate.queue_status = u'Needs review'
+                    candidate.lp_save()
             else:
                 if not self.dry_run:
                     target_tree.commit(commit_message)
