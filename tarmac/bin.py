@@ -154,6 +154,7 @@ class TarmacLander:
             else:
                 if not self.dry_run:
                     target_tree.commit(commit_message)
+            # This is only executed in a dry_run
             target_tree.revert()
 
 
