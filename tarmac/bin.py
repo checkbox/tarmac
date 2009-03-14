@@ -1,4 +1,3 @@
-# Copyright (c) 2009 - Paul Hummer
 '''Code used by Tarmac scripts.'''
 import logging
 from optparse import OptionParser

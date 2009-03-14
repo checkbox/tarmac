@@ -1,4 +1,3 @@
-# Copyright (c) 2009 - Paul Hummer
 '''Tarmac specific exceptions.'''
 
 

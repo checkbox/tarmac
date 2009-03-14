@@ -1,4 +1,3 @@
-# Copyright (c) 2009 - Paul Hummer
 '''Utilities for Tarmac, mostly dealing with Launchpad.'''
 import os
 
