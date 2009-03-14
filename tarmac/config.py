@@ -25,6 +25,7 @@ class TarmacConfig:
         self._CONFIG_FILE = os.path.join(self.CONFIG_HOME, 'tarmac.conf')
         self._CONFIG = ConfigParser()
         self._CONFIG.read(self._CONFIG_FILE)
+        # TODO: This should really be named self._PROJECT
         self._SECTION = section
 
     def _check_config_dirs(self):
@@ -45,6 +46,14 @@ class TarmacConfig:
     def commit_string(self):
         '''Get the commit_string from the stored config.'''
         return self.get('commit_string')
+
+    @property
+    def log_file(self):
+        '''Get the log_file from config or return a default.'''
+        try:
+            return self._CONFIG.get(self._SECTION, 'log_file')
+        except (NoOptionError, NoSectionError):
+            return os.path.join(self.CONFIG_HOME, self._SECTION)
 
     def get(self, key):
         '''Get a config value for the given key.'''

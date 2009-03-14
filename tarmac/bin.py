@@ -1,5 +1,6 @@
 # Copyright (c) 2009 - Paul Hummer
 '''Code used by Tarmac scripts.'''
+import logging
 from optparse import OptionParser
 import os
 from shutil import rmtree
@@ -44,6 +45,10 @@ class TarmacLander:
             self.test_command = self.configuration.test_command
         else:
             self.test_command = None
+
+        logging.basicConfig(filename=self.configuration.log_file,
+            level=logging.INFO)
+        self.logger = logging.getLogger('tarmac-lander')
 
     def _find_commit_message(self, candidate):
         '''Find the proper commit comment.'''
