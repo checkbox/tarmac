@@ -15,7 +15,6 @@ from tarmac.exceptions import NoCommitMessage
 from tarmac.utils import get_launchpad_object
 
 load_plugins()
-DEV_SERVICE_ROOT = 'https://api.launchpad.dev/beta/'
 
 
 class TarmacLander:
