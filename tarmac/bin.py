@@ -123,18 +123,17 @@ class TarmacLander:
                     commit_string = ('%(commit_line)s')
                 commit_message = commit_string % commit_dict
             except NoCommitMessage:
-                print ('Proposal to merge %(branch_name)s is missing '
+                logger.warn(
+                    'Proposal to merge %(branch_name)s is missing '
                     'an associated commit message.  As a result, '
                     'the branch will not be merged.' % {
-                    'branch_name': candidate.source_branch.bzr_identity})
-                print
+                        'branch_name': candidate.source_branch.bzr_identity})
                 continue
 
 
-            if self.dry_run:
-                print '%(source_branch)s - %(commit_message)s' % {
-                    'source_branch': candidate.source_branch.bzr_identity,
-                    'commit_message': commit_message}
+            print '%(source_branch)s - %(commit_message)s' % {
+                'source_branch': candidate.source_branch.bzr_identity,
+                'commit_message': commit_message}
 
             source_branch = branch.Branch.open(
                 candidate.source_branch.bzr_identity)
@@ -154,10 +153,10 @@ class TarmacLander:
                     if not self.dry_run:
                         target_tree.commit(commit_message)
                     else:
-                        print 'Branch passed test command'
+                        print '  - Branch passed test command'
                 else:
                     if self.dry_run:
-                        print 'Branch failed test command'
+                        print '  - Branch failed test command'
                     target_tree.revert()
                     comment = u'\n'.join([stdout_value, stderr_value])
                     candidate.createComment(subject="Failed test command",
@@ -167,6 +166,7 @@ class TarmacLander:
             else:
                 if not self.dry_run:
                     target_tree.commit(commit_message)
+
             # This is only executed in a dry_run
             target_tree.revert()
 
