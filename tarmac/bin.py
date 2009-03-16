@@ -22,6 +22,7 @@ class TarmacLander:
 
     def __init__(self):
 
+        self._cleanup_tasks = []
         parser = OptionParser("%prog [options] <projectname>")
         parser.add_option('--dry-run', action='store_true',
             help='Print out the branches that would be merged and their '
@@ -48,6 +49,13 @@ class TarmacLander:
         logging.basicConfig(filename=self.configuration.log_file,
             level=logging.INFO)
         self.logger = logging.getLogger('tarmac-lander')
+
+        if os.path.exists(self.configuration.PID_FILE):
+            print 'An instance of tarmac is already running. Exiting...'
+            sys.exit()
+        pidfile = open(self.configuration.PID_FILE, 'wb')
+        pidfile.write(str(os.getpid()))
+        pidfile.close()
 
     def _find_commit_message(self, candidate):
         '''Find the proper commit comment.'''
@@ -123,7 +131,7 @@ class TarmacLander:
                     commit_string = ('%(commit_line)s')
                 commit_message = commit_string % commit_dict
             except NoCommitMessage:
-                logger.warn(
+                self.logger.warn(
                     'Proposal to merge %(branch_name)s is missing '
                     'an associated commit message.  As a result, '
                     'the branch will not be merged.' % {
@@ -166,6 +174,8 @@ class TarmacLander:
             else:
                 if not self.dry_run:
                     target_tree.commit(commit_message)
+
+            os.remove(self.configuration.PID_FILE)
 
             # This is only executed in a dry_run
             target_tree.revert()
