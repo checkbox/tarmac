@@ -1,4 +1,5 @@
 '''Code used by Tarmac scripts.'''
+import atexit
 import logging
 from optparse import OptionParser
 import os
@@ -7,6 +8,7 @@ import subprocess
 import sys
 
 from bzrlib import branch, bzrdir
+from bzrlib.errors import PointlessMerge
 from bzrlib.plugin import load_plugins
 from launchpadlib.errors import HTTPError
 
@@ -17,30 +19,51 @@ from tarmac.utils import get_launchpad_object
 load_plugins()
 
 
-class TarmacLander:
+class TarmacScript:
+    '''An abstract script for reusable parts of Tarmac.'''
+
+    def __init__(self):
+        self.parser = self._create_option_parser()
+        self.options, self.args = self.parser.parse_args()
+
+    def create_pid(self):
+        '''Create a pidfile for the running process.'''
+        assert not os.path.exists(self.configuration.PID_FILE)
+        pidfile = open(self.configuration.PID_FILE, 'wb')
+        pidfile.write(str(os.getpid()))
+        pidfile.close()
+        atexit.register(self.delete_pid)
+
+    def delete_pid(self):
+        '''Delete the pid file.
+
+        This method is usually called when the atexit signal is emitted.
+        '''
+        assert os.path.exists(self.configuration.PID_FILE)
+        os.remove(self.configuration.PID_FILE)
+
+    def _create_option_parser(self):
+        '''Create the option parser.'''
+        raise NotImplementedError
+
+
+class TarmacLander(TarmacScript):
     '''Tarmac script.'''
 
     def __init__(self):
 
-        self._cleanup_tasks = []
-        parser = OptionParser("%prog [options] <projectname>")
-        parser.add_option('--dry-run', action='store_true',
-            help='Print out the branches that would be merged and their '
-                 'commit messages, but don\'t actually merge the branches.')
-        parser.add_option('--test-command', type='string', default=None,
-            metavar='TEST',
-            help='The test command to run after merging a branch.')
-        options, args = parser.parse_args()
-        self.dry_run = options.dry_run
+        TarmacScript.__init__(self)
 
-        if len(args) != 1:
-            parser.error("Please specify a project name.")
+        self.dry_run = self.options.dry_run
 
-        self.project, = args
+        if len(self.args) != 1:
+            self.parser.error("Please specify a project name.")
+
+        self.project, = self.args
         self.configuration = TarmacConfig(self.project)
 
-        if options.test_command:
-            self.test_command = options.test_command
+        if self.options.test_command:
+            self.test_command = self.options.test_command
         elif self.configuration.test_command:
             self.test_command = self.configuration.test_command
         else:
@@ -50,12 +73,22 @@ class TarmacLander:
             level=logging.INFO)
         self.logger = logging.getLogger('tarmac-lander')
 
+        # Write a pid file
         if os.path.exists(self.configuration.PID_FILE):
             print 'An instance of tarmac is already running. Exiting...'
             sys.exit()
-        pidfile = open(self.configuration.PID_FILE, 'wb')
-        pidfile.write(str(os.getpid()))
-        pidfile.close()
+        self.create_pid()
+
+    def _create_option_parser(self):
+        '''See `TarmacScript._create_option_parser`.'''
+        parser = OptionParser("%prog [options] <projectname>")
+        parser.add_option('--dry-run', action='store_true',
+            help='Print out the branches that would be merged and their '
+                 'commit messages, but don\'t actually merge the branches.')
+        parser.add_option('--test-command', type='string', default=None,
+            metavar='TEST',
+            help='The test command to run after merging a branch.')
+        return parser
 
     def _find_commit_message(self, candidate):
         '''Find the proper commit comment.'''
@@ -146,7 +179,11 @@ class TarmacLander:
             source_branch = branch.Branch.open(
                 candidate.source_branch.bzr_identity)
 
-            target_tree.merge_from_branch(source_branch)
+            try:
+                target_tree.merge_from_branch(source_branch)
+            except PointlessMerge:
+                continue
+
             if self.test_command:
                 cwd = os.getcwd()
                 os.chdir(temp_dir)
@@ -166,16 +203,14 @@ class TarmacLander:
                     if self.dry_run:
                         print '  - Branch failed test command'
                     target_tree.revert()
-                    comment = u'\n'.join([stdout_value, stderr_value])
-                    candidate.createComment(subject="Failed test command",
-                                            content=comment)
-                    candidate.queue_status = u'Needs review'
-                    candidate.lp_save()
+                    #comment = u'\n'.join([stdout_value, stderr_value])
+                    #candidate.createComment(subject="Failed test command",
+                    #                        content=comment)
+                    #candidate.queue_status = u'Needs review'
+                    #candidate.lp_save()
             else:
                 if not self.dry_run:
                     target_tree.commit(commit_message)
-
-            os.remove(self.configuration.PID_FILE)
 
             # This is only executed in a dry_run
             target_tree.revert()
