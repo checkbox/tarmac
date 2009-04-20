@@ -13,7 +13,6 @@ from bzrlib.plugin import load_plugins
 from launchpadlib.errors import HTTPError
 
 from tarmac.config import TarmacConfig
-from tarmac.exceptions import NoCommitMessage
 from tarmac.utils import get_launchpad_object
 
 load_plugins()
