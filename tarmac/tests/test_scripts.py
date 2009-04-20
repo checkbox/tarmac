@@ -2,10 +2,11 @@
 # pylint: disable-msg=W0212
 __metaclass__ = type
 
+from optparse import OptionParser
 import sys
 import unittest
 
-from tarmac.bin import TarmacLander
+from tarmac.bin import TarmacLander, TarmacScript
 from tarmac.exceptions import NoCommitMessage
 
 
@@ -28,10 +29,20 @@ def make_comment_list(count=5):
 class TestTarmacScript(unittest.TestCase):
     '''Tests for tarmac.bin.TarmacScript.'''
 
-    def test_test_mode(self):
-        '''Test that test_mode is set correctly.'''
-        script = TarmacLander(test_mode=True)
-        self.assertTrue(script.test_mode)
+    class TarmacDummyScript(TarmacScript):
+        '''A dummy Tarmac script for testability.'''
+        def _create_option_parser(self): return OptionParser()
+
+    def test_create_option_parser_not_implemented(self):
+        '''Test that the _create_config_parser method raises NotImplemented.'''
+        self.assertRaises(NotImplementedError, TarmacScript, test_mode=True)
+
+    def test_dummy_script_option_parser(self):
+        '''Test that _create_config_parser is implemented in TarmacDummyScript.
+        '''
+        sys.argv = ['']
+        script = self.TarmacDummyScript(test_mode=True)
+
 
 class TestTarmacLander(unittest.TestCase):
     '''Tests for TarmacLander.'''
@@ -53,4 +64,9 @@ class TestTarmacLander(unittest.TestCase):
         sys.argv = ['', 'foo', '--test-command=trial foo.tests']
         script = TarmacLander(test_mode=True)
         self.assertEqual(script.test_command, u'trial foo.tests')
+
+    def test_test_mode(self):
+        '''Test that test_mode is set correctly.'''
+        script = TarmacLander(test_mode=True)
+        self.assertTrue(script.test_mode)
 
