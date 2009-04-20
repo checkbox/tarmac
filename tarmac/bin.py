@@ -180,6 +180,7 @@ class TarmacLander(TarmacScript):
             try:
                 target_tree.merge_from_branch(source_branch)
             except PointlessMerge:
+                target_tree.revert()
                 continue
 
             if self.test_command:
