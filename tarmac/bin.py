@@ -92,25 +92,6 @@ class TarmacLander(TarmacScript):
             help='The test command to run after merging a branch.')
         return parser
 
-    def _find_commit_message(self, candidate):
-        '''Find the proper commit comment.'''
-        # Currently, commit_message isn't editable through the Web UI, so it's
-        # not practical to use it, but when it is, it will not only be
-        # practical, but this method will just go away completely.
-        #if candidate.commit_message:
-        #    return candidate.commit_message
-
-        for comment in candidate.all_comments:
-            try:
-                if comment.title.lower().startswith('commit message'):
-                    return comment.message_body
-                elif comment.message_body.lower().startswith(
-                                                        'commit message: '):
-                    return comment.message_body[len('Commit message: '):]
-            except AttributeError:
-                continue
-        raise NoCommitMessage
-
     def _get_reviewers(self, candidate):
         '''Get all reviewers who approved the review.'''
         return [comment.reviewer for comment in candidate.all_comments
@@ -161,8 +142,7 @@ class TarmacLander(TarmacScript):
 
             try:
                 commit_dict = {}
-                commit_dict['commit_line'] = self._find_commit_message(
-                    candidate)
+                commit_dict['commit_line'] = candidate.commit_message
                 # This is a great idea, but apparently reviewer isn't exposed
                 # in the API just yet.
                 #commit_dict['reviewers'] = self._get_reviewers(candidate)
