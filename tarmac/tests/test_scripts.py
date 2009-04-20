@@ -31,12 +31,12 @@ class TestTarmacLander(unittest.TestCase):
     def test_lander_dry_run(self):
         '''Test that setting --dry-run sets the dry_run property.'''
         sys.argv = ['', 'foo', '--dry-run']
-        script = TarmacLander()
+        script = TarmacLander(test_mode=True)
         self.assertTrue(script.dry_run)
 
     def test_lander_project(self):
         '''Test that the project argument gets handled properly.'''
         sys.argv = ['', 'foo']
-        script = TarmacLander()
+        script = TarmacLander(test_mode=True)
         self.assertEqual(script.project, u'foo')
 

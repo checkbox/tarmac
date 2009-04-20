@@ -22,7 +22,7 @@ load_plugins()
 class TarmacScript:
     '''An abstract script for reusable parts of Tarmac.'''
 
-    def __init__(self):
+    def __init__(self, test_mode=False):
         self.parser = self._create_option_parser()
         self.options, self.args = self.parser.parse_args()
 
@@ -50,9 +50,9 @@ class TarmacScript:
 class TarmacLander(TarmacScript):
     '''Tarmac script.'''
 
-    def __init__(self):
+    def __init__(self, test_mode=False):
 
-        TarmacScript.__init__(self)
+        TarmacScript.__init__(self, test_mode)
 
         self.dry_run = self.options.dry_run
 
@@ -74,12 +74,13 @@ class TarmacLander(TarmacScript):
         self.logger = logging.getLogger('tarmac-lander')
 
         # Write a pid file
-        if os.path.exists(self.configuration.PID_FILE):
-            message = 'An instance of tarmac is already running. Exiting...'
-            self.logger.info(message)
-            print message
-            sys.exit()
-        self.create_pid()
+        if not test_mode:
+            if os.path.exists(self.configuration.PID_FILE):
+                message = 'An instance of tarmac is already running.'
+                self.logger.info(message)
+                print message
+                sys.exit()
+            self.create_pid()
 
     def _create_option_parser(self):
         '''See `TarmacScript._create_option_parser`.'''
