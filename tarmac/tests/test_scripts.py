@@ -15,7 +15,8 @@ class TestTarmacScript(unittest.TestCase):
 
     class TarmacDummyScript(TarmacScript):
         '''A dummy Tarmac script for testability.'''
-        def _create_option_parser(self): return OptionParser()
+        def _create_option_parser(self):
+            return OptionParser()
 
     def test_create_option_parser_not_implemented(self):
         '''Test that the _create_config_parser method raises NotImplemented.'''
@@ -26,6 +27,7 @@ class TestTarmacScript(unittest.TestCase):
         '''
         sys.argv = ['']
         script = self.TarmacDummyScript(test_mode=True)
+        self.assertTrue(isinstance(script, self.TarmacDummyScript))
 
 
 class TestTarmacLander(unittest.TestCase):
