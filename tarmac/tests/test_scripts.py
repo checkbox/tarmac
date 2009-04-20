@@ -7,7 +7,6 @@ import sys
 import unittest
 
 from tarmac.bin import TarmacLander, TarmacScript
-from tarmac.exceptions import NoCommitMessage
 
 
 class TestTarmacScript(unittest.TestCase):

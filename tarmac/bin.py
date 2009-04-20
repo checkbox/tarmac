@@ -143,6 +143,12 @@ class TarmacLander(TarmacScript):
 
         for candidate in candidates:
 
+            if not candidate.commit_message:
+                self.logger.error(
+                    'Proposal to merge %(source_branch)s contains an empty '
+                    'commit message.  Skipping.' % {
+                        'source_branch': candidate.source_branch.bzr_identity})
+                continue
             try:
                 commit_dict = {}
                 commit_dict['commit_line'] = candidate.commit_message
