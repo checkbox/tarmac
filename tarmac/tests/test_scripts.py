@@ -10,22 +10,6 @@ from tarmac.bin import TarmacLander, TarmacScript
 from tarmac.exceptions import NoCommitMessage
 
 
-class MockBMPComment:
-    '''A mock merge proposal comment.'''
-
-    def __init__(self, _id):
-        self.title = u'This is a title %s.' % _id
-        self.message_body = u'This is a comment %s.' % _id
-
-
-def make_comment_list(count=5):
-    '''Make a list of comments.'''
-    comments = []
-    for i in range(0, count):
-        comments.append(MockBMPComment(i))
-    return comments
-
-
 class TestTarmacScript(unittest.TestCase):
     '''Tests for tarmac.bin.TarmacScript.'''
 
