@@ -209,8 +209,7 @@ class TarmacLander(TarmacScript):
             else:
                 if not self.dry_run:
                     target_tree.commit(commit_message)
-
-            # This is only executed in a dry_run
-            target_tree.revert()
+                else:
+                    target_tree.revert()
 
 
