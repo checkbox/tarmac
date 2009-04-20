@@ -75,7 +75,9 @@ class TarmacLander(TarmacScript):
 
         # Write a pid file
         if os.path.exists(self.configuration.PID_FILE):
-            print 'An instance of tarmac is already running. Exiting...'
+            message = 'An instance of tarmac is already running. Exiting...'
+            self.logger.info(message)
+            print message
             sys.exit()
         self.create_pid()
 
@@ -120,20 +122,24 @@ class TarmacLander(TarmacScript):
         try:
             launchpad = get_launchpad_object(self.configuration)
         except HTTPError:
-            print (
+            message = (
                 'Oops!  It appears that the OAuth token is invalid.  Please '
                 'delete %(credential_file)s and re-authenticate.' %
                     {'credential_file': self.configuration.CREDENTIALS})
+            self.logger.error(message)
+            print message
             sys.exit()
 
         project = launchpad.projects[self.project]
         try:
             trunk = project.development_focus.branch
         except AttributeError:
-            print (
+            message = (
                 'Oops!  It looks like you\'ve forgotten to specify a '
                 'development focus branch.  Please link your "trunk" branch '
                 'to the trunk development focus.')
+            self.logger.error(message)
+            print message
             sys.exit()
 
         candidates = [entry for entry in trunk.landing_candidates
