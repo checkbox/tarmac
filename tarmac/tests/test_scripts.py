@@ -25,6 +25,14 @@ def make_comment_list(count=5):
     return comments
 
 
+class TestTarmacScript(unittest.TestCase):
+    '''Tests for tarmac.bin.TarmacScript.'''
+
+    def test_test_mode(self):
+        '''Test that test_mode is set correctly.'''
+        script = TarmacLander(test_mode=True)
+        self.assertTrue(script.test_mode)
+
 class TestTarmacLander(unittest.TestCase):
     '''Tests for TarmacLander.'''
 

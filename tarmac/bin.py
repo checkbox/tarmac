@@ -25,6 +25,7 @@ class TarmacScript:
     def __init__(self, test_mode=False):
         self.parser = self._create_option_parser()
         self.options, self.args = self.parser.parse_args()
+        self.test_mode = test_mode
 
     def create_pid(self):
         '''Create a pidfile for the running process.'''
@@ -86,8 +87,9 @@ class TarmacLander(TarmacScript):
         '''See `TarmacScript._create_option_parser`.'''
         parser = OptionParser("%prog [options] <projectname>")
         parser.add_option('--dry-run', action='store_true',
-            help='Print out the branches that would be merged and their '
-                 'commit messages, but don\'t actually merge the branches.')
+            help='Merge the approved branch candidates (and optionally run '
+                 'their accompanying test command), and then roll back the '
+                 'trunk branch to pristine state.')
         parser.add_option('--test-command', type='string', default=None,
             metavar='TEST',
             help='The test command to run after merging a branch.')
