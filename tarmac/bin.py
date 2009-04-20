@@ -144,6 +144,9 @@ class TarmacLander(TarmacScript):
 
         candidates = [entry for entry in trunk.landing_candidates
                         if entry.queue_status == u'Approved']
+        if not candidates:
+            self.logger.info('No branches approved to land.')
+            return
 
         temp_dir = os.path.join('/tmp', self.project)
         if os.path.exists(temp_dir):
