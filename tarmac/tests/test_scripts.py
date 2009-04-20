@@ -40,3 +40,9 @@ class TestTarmacLander(unittest.TestCase):
         script = TarmacLander(test_mode=True)
         self.assertEqual(script.project, u'foo')
 
+    def test_test_command(self):
+        '''Test the --test-command option.'''
+        sys.argv = ['', 'foo', '--test-command=trial foo.tests']
+        script = TarmacLander(test_mode=True)
+        self.assertEqual(script.test_command, u'trial foo.tests')
+
