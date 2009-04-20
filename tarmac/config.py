@@ -8,7 +8,7 @@ from ConfigParser import SafeConfigParser as ConfigParser
 class TarmacConfig:
     '''A configuration class.'''
 
-    def __init__(self, section=None):
+    def __init__(self, project=None):
         '''The config options are based on ~/.config/tarmac.
 
         If the configuration directories don't exist, they will be created.
@@ -16,7 +16,7 @@ class TarmacConfig:
         config.
         '''
         self.CONFIG_HOME = os.path.expanduser('~/.config/tarmac')
-        self.PID_FILE = '/var/tmp/tarmac-%(project)s' % {'project': section }
+        self.PID_FILE = '/var/tmp/tarmac-%(project)s' % {'project': project }
         self.CREDENTIALS = os.path.join(self.CONFIG_HOME, 'credentials')
 
         self.CACHEDIR = os.path.join(self.CONFIG_HOME, 'cachedir')
@@ -25,8 +25,7 @@ class TarmacConfig:
         self._CONFIG_FILE = os.path.join(self.CONFIG_HOME, 'tarmac.conf')
         self._CONFIG = ConfigParser()
         self._CONFIG.read(self._CONFIG_FILE)
-        # TODO: This should really be named self._PROJECT
-        self._SECTION = section
+        self._PROJECT = project
 
     def _check_config_dirs(self):
         '''Create the configuration directory if it doesn't exist.'''
@@ -51,15 +50,14 @@ class TarmacConfig:
     def log_file(self):
         '''Get the log_file from config or return a default.'''
         try:
-            return self._CONFIG.get(self._SECTION, 'log_file')
+            return self._CONFIG.get(self._PROJECT, 'log_file')
         except (NoOptionError, NoSectionError):
-            return os.path.join(self.CONFIG_HOME, self._SECTION)
+            return os.path.join(self.CONFIG_HOME, self._PROJECT)
 
     def get(self, key):
         '''Get a config value for the given key.'''
         try:
-            return self._CONFIG.get(self._SECTION, key)
+            return self._CONFIG.get(self._PROJECT, key)
         except (NoOptionError, NoSectionError):
             return None
-
 
