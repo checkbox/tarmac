@@ -46,6 +46,10 @@ class TarmacScript:
         '''Create the option parser.'''
         raise NotImplementedError
 
+    def main(self):
+        '''Main part of each script.'''
+        raise NotImplementedError
+
 
 class TarmacLander(TarmacScript):
     '''Tarmac script.'''
@@ -100,7 +104,7 @@ class TarmacLander(TarmacScript):
             if comment.vote == u'Approve'].join(', ')
 
     def main(self):
-        '''Execute the script.'''
+        '''See `TarmacScript.main`.'''
 
         try:
             launchpad = get_launchpad_object(self.configuration)
