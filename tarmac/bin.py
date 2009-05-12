@@ -12,8 +12,8 @@ from bzrlib.errors import PointlessMerge
 from bzrlib.plugin import load_plugins
 from launchpadlib.errors import HTTPError
 
-from tarmaclib.config import TarmacConfig
-from tarmaclib.utils import get_launchpad_object
+from tarmac.config import TarmacConfig
+from tarmac.utils import get_launchpad_object
 
 load_plugins()
 

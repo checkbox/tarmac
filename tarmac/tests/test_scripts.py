@@ -6,7 +6,7 @@ from optparse import OptionParser
 import sys
 import unittest
 
-from tarmaclib.bin import TarmacLander, TarmacScript
+from tarmac.bin import TarmacLander, TarmacScript
 
 
 class TestTarmacScript(unittest.TestCase):

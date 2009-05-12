@@ -1,6 +1,6 @@
 TESTFLAGS=
 test:
-	trial $(TESTFLAGS) tarmaclib
+	trial $(TESTFLAGS) tarmac
 
 test-fail:
 	trial this-will-fail
