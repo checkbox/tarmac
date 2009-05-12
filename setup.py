@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# Copyright 2009 Paul Hummer - See LICENSE
 '''Tarmac installation script.'''
 
 from distutils.core import setup

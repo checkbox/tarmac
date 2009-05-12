@@ -1,3 +1,4 @@
+# Copyright 2009 Paul Hummer - See LICENSE
 '''Tests for Tarmac scripts.'''
 # pylint: disable-msg=W0212
 __metaclass__ = type

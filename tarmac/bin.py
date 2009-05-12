@@ -1,3 +1,4 @@
+# Copyright 2009 Paul Hummer - See LICENSE
 '''Code used by Tarmac scripts.'''
 import atexit
 import logging

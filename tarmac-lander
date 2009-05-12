@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# Copyright 2009 Paul Hummer - See LICENSE
 from tarmac.bin import TarmacLander
 
 if __name__ == '__main__':

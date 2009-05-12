@@ -1,3 +1,4 @@
+# Copyright 2009 Paul Hummer - See LICENSE
 '''Configuration handler.'''
 # pylint: disable-msg=C0103
 import os
