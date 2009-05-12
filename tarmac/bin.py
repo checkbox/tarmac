@@ -14,6 +14,7 @@ from bzrlib.plugin import load_plugins
 from launchpadlib.errors import HTTPError
 
 from tarmac.config import TarmacConfig
+from tarmac.hooks import TarmacHooks
 from tarmac.utils import get_launchpad_object
 
 load_plugins()
@@ -21,6 +22,8 @@ load_plugins()
 
 class TarmacScript:
     '''An abstract script for reusable parts of Tarmac.'''
+
+    hooks = TarmacHooks()
 
     def __init__(self, test_mode=False):
         self.parser = self._create_option_parser()
