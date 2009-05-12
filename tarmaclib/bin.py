@@ -12,8 +12,8 @@ from bzrlib.errors import PointlessMerge
 from bzrlib.plugin import load_plugins
 from launchpadlib.errors import HTTPError
 
-from tarmac.config import TarmacConfig
-from tarmac.utils import get_launchpad_object
+from tarmaclib.config import TarmacConfig
+from tarmaclib.utils import get_launchpad_object
 
 load_plugins()
 
@@ -152,26 +152,18 @@ class TarmacLander(TarmacScript):
                     'commit message.  Skipping.' % {
                         'source_branch': candidate.source_branch.bzr_identity})
                 continue
-            try:
-                commit_dict = {}
-                commit_dict['commit_line'] = candidate.commit_message
-                # This is a great idea, but apparently reviewer isn't exposed
-                # in the API just yet.
-                #commit_dict['reviewers'] = self._get_reviewers(candidate)
 
-                if self.configuration.commit_string:
-                    commit_string = self.configuration.commit_string
-                else:
-                    commit_string = ('%(commit_line)s')
-                commit_message = commit_string % commit_dict
-            except NoCommitMessage:
-                self.logger.warn(
-                    'Proposal to merge %(branch_name)s is missing '
-                    'an associated commit message.  As a result, '
-                    'the branch will not be merged.' % {
-                        'branch_name': candidate.source_branch.bzr_identity})
-                continue
+            commit_dict = {}
+            commit_dict['commit_line'] = candidate.commit_message
+            # This is a great idea, but apparently reviewer isn't exposed
+            # in the API just yet.
+            #commit_dict['reviewers'] = self._get_reviewers(candidate)
 
+            if self.configuration.commit_string:
+                commit_string = self.configuration.commit_string
+            else:
+                commit_string = ('%(commit_line)s')
+            commit_message = commit_string % commit_dict
 
             print '%(source_branch)s - %(commit_message)s' % {
                 'source_branch': candidate.source_branch.bzr_identity,
