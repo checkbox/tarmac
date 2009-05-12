@@ -1,0 +1,1 @@
+'''Bazaar Plugin for Tarmac.'''
