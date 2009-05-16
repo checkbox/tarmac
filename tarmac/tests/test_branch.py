@@ -3,6 +3,7 @@
 import unittest
 
 from bzrlib import branch as bzr_branch
+from bzrlib.errors import NoCommits
 
 from tarmac import branch
 from tarmac.tests.mock import MockLPBranch
@@ -38,4 +39,12 @@ class TestBranch(unittest.TestCase):
 
         self.assertRaises(
             Exception, a_branch.merge, another_branch)
+
+    def test_merge(self):
+        '''A merge on a branch with a tree will succeed.'''
+        a_branch = branch.Branch(MockLPBranch(), create_tree=True)
+        another_branch = branch.Branch(MockLPBranch())
+
+        # XXX: Find a way to generate dummy revisions for the second branch.
+        self.assertRaises(NoCommits, a_branch.merge, another_branch)
 
