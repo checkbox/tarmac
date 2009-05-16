@@ -13,20 +13,29 @@ class TestBranch(unittest.TestCase):
 
     def test_create(self):
         '''Test the creation of a TarmacBranch instance.'''
-        b = branch.Branch(MockLPBranch())
+        a_branch = branch.Branch(MockLPBranch())
 
-        self.assertTrue(isinstance(b, branch.Branch))
-        self.assertTrue(isinstance(b.branch, bzr_branch.Branch))
-        self.assertTrue(b.lp_branch.bzr_identity)
-        self.assertFalse(b.has_tree)
-        self.assertFalse(hasattr(b, 'tree'))
+        self.assertTrue(isinstance(a_branch, branch.Branch))
+        self.assertTrue(isinstance(a_branch.branch, bzr_branch.Branch))
+        self.assertTrue(a_branch.lp_branch.bzr_identity)
+        self.assertFalse(a_branch.has_tree)
+        self.assertFalse(hasattr(a_branch, 'tree'))
 
     def test_create_with_tree(self):
         '''Test the creation of a TarmacBranch with a created tree.'''
-        b = branch.Branch(MockLPBranch(), create_tree=True)
+        a_branch = branch.Branch(MockLPBranch(), create_tree=True)
 
-        self.assertTrue(isinstance(b, branch.Branch))
-        self.assertTrue(isinstance(b.branch, bzr_branch.Branch))
-        self.assertTrue(b.lp_branch.bzr_identity)
-        self.assertTrue(b.has_tree)
-        self.assertTrue(hasattr(b, 'tree'))
+        self.assertTrue(isinstance(a_branch, branch.Branch))
+        self.assertTrue(isinstance(a_branch.branch, bzr_branch.Branch))
+        self.assertTrue(a_branch.lp_branch.bzr_identity)
+        self.assertTrue(a_branch.has_tree)
+        self.assertTrue(hasattr(a_branch, 'tree'))
+
+    def test_merge_raises_exception_with_no_tree(self):
+        '''A merge on a branch with no tree will raise an exception.'''
+        a_branch = branch.Branch(MockLPBranch())
+        another_branch = branch.Branch(MockLPBranch())
+
+        self.assertRaises(
+            Exception, a_branch.merge, another_branch)
+
