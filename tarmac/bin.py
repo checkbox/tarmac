@@ -13,6 +13,7 @@ from bzrlib.errors import PointlessMerge
 from bzrlib.plugin import load_plugins
 from launchpadlib.errors import HTTPError
 
+from tarmac.branch import Branch
 from tarmac.config import TarmacConfig
 from tarmac.hooks import tarmac_hooks
 from tarmac.utils import get_launchpad_object
@@ -102,7 +103,7 @@ class TarmacLander(TarmacScript):
         '''See `TarmacScript.main`.'''
 
         try:
-            launchpad = get_launchpad_object(self.configuration)
+            launchpad = get_launchpad_object(self.configuration, True)
         except HTTPError:
             message = (
                 'Oops!  It appears that the OAuth token is invalid.  Please '
@@ -114,7 +115,7 @@ class TarmacLander(TarmacScript):
 
         project = launchpad.projects[self.project]
         try:
-            trunk = project.development_focus.branch
+            trunk = Branch(project.development_focus.branch, create_tree=True)
         except AttributeError:
             message = (
                 'Oops!  It looks like you\'ve forgotten to specify a '
@@ -130,16 +131,6 @@ class TarmacLander(TarmacScript):
         if not candidates:
             self.logger.info('No branches approved to land.')
             return
-
-        if not self.dry_run:
-            temp_dir = os.path.join('/tmp', self.project)
-            if os.path.exists(temp_dir):
-                rmtree(temp_dir)
-            os.mkdir(temp_dir)
-            accelerator, target_branch = bzrdir.BzrDir.open_tree_or_branch(
-                trunk.bzr_identity)
-            target_tree = target_branch.create_checkout(
-                temp_dir, None, True, accelerator)
 
         for candidate in candidates:
 
@@ -160,21 +151,23 @@ class TarmacLander(TarmacScript):
                 'source_branch': candidate.source_branch.bzr_identity,
                 'commit_message': commit_message}
 
-            source_branch = branch.Branch.open(
-                candidate.source_branch.bzr_identity)
+            source_branch = Branch(candidate.source_branch)
 
             try:
-                target_tree.merge_from_branch(source_branch)
+                trunk.merge(source_branch)
             except PointlessMerge:
-                target_tree.revert()
+                trunk.cleanup()
                 continue
 
             try:
                 tarmac_hooks['pre_tarmac_commit'].fire(
-                    self.options, self.configuration, candidate, temp_dir)
-                target_tree.commit(commit_message)
-            except:
-                target_tree.revert()
+                    self.options, self.configuration, candidate,
+                    trunk.temporary_dir)
+                #target_tree.commit(commit_message)
+                print 'Would commit'
+            except :
+                print 'Failed hooks'
+                trunk.cleanup()
 
             tarmac_hooks['post_tarmac_commit'].fire()
 

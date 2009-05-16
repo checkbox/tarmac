@@ -21,6 +21,8 @@ class Branch(object):
         if create_tree:
             self.temporary_dir = os.path.join(
                 '/tmp', self.lp_branch.project.name)
+            if os.path.exists(self.temporary_dir):
+                shutil.rmtree(self.temporary_dir)
             self.tree = self.branch.create_checkout(self.temporary_dir)
 
     def merge(self, branch):
@@ -33,4 +35,8 @@ class Branch(object):
         '''Remove the working tree from the temp dir.'''
         if self.has_tree:
             shutil.rmtree(self.temporary_dir)
+
+    @property
+    def landing_candidates(self):
+        return self.lp_branch.landing_candidates
 
