@@ -163,7 +163,7 @@ class TarmacLander(TarmacScript):
                 tarmac_hooks['pre_tarmac_commit'].fire(
                     self.options, self.configuration, candidate,
                     trunk.temporary_dir)
-                #target_tree.commit(commit_message)
+                #trunk.commit(commit_message)
                 print 'Would commit'
             except :
                 print 'Failed hooks'
