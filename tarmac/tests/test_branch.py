@@ -1,5 +1,6 @@
 # Copyright 2009 Paul Hummer - See LICENSE
 '''Tests for tarmac.branch'''
+import os
 import unittest
 
 from bzrlib import branch as bzr_branch
@@ -47,4 +48,12 @@ class TestBranch(unittest.TestCase):
 
         # XXX: Find a way to generate dummy revisions for the second branch.
         self.assertRaises(NoCommits, a_branch.merge, another_branch)
+
+    def test_cleanup(self):
+        '''The branch object should clean up after itself.'''
+        a_branch = branch.Branch(MockLPBranch(), create_tree=True)
+        self.assertTrue(os.path.exists(a_branch.temporary_dir))
+
+        a_branch.cleanup()
+        self.assertFalse(os.path.exists(a_branch.temporary_dir))
 
