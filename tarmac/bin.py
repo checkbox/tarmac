@@ -14,7 +14,7 @@ from bzrlib.plugin import load_plugins
 from launchpadlib.errors import HTTPError
 
 from tarmac.config import TarmacConfig
-from tarmac.hooks import TarmacHooks
+from tarmac.hooks import tarmac_hooks
 from tarmac.utils import get_launchpad_object
 
 load_plugins()
@@ -22,8 +22,6 @@ load_plugins()
 
 class TarmacScript:
     '''An abstract script for reusable parts of Tarmac.'''
-
-    hooks = TarmacHooks()
 
     def __init__(self, test_mode=False):
         self.parser = self._create_option_parser()
@@ -69,13 +67,6 @@ class TarmacLander(TarmacScript):
 
         self.project, = self.args
         self.configuration = TarmacConfig(self.project)
-
-        if self.options.test_command:
-            self.test_command = self.options.test_command
-        elif self.configuration.test_command:
-            self.test_command = self.configuration.test_command
-        else:
-            self.test_command = None
 
         logging.basicConfig(filename=self.configuration.log_file,
             level=logging.INFO)
@@ -139,14 +130,15 @@ class TarmacLander(TarmacScript):
             self.logger.info('No branches approved to land.')
             return
 
-        temp_dir = os.path.join('/tmp', self.project)
-        if os.path.exists(temp_dir):
-            rmtree(temp_dir)
-        os.mkdir(temp_dir)
-        accelerator, target_branch = bzrdir.BzrDir.open_tree_or_branch(
-            trunk.bzr_identity)
-        target_tree = target_branch.create_checkout(
-            temp_dir, None, True, accelerator)
+        if not self.dry_run:
+            temp_dir = os.path.join('/tmp', self.project)
+            if os.path.exists(temp_dir):
+                rmtree(temp_dir)
+            os.mkdir(temp_dir)
+            accelerator, target_branch = bzrdir.BzrDir.open_tree_or_branch(
+                trunk.bzr_identity)
+            target_tree = target_branch.create_checkout(
+                temp_dir, None, True, accelerator)
 
         for candidate in candidates:
 
@@ -182,34 +174,44 @@ class TarmacLander(TarmacScript):
                 target_tree.revert()
                 continue
 
-            if self.test_command:
-                cwd = os.getcwd()
-                os.chdir(temp_dir)
-                proc = subprocess.Popen(self.test_command,
-                                        shell=True,
-                                        stdout=subprocess.PIPE,
-                                        stderr=subprocess.PIPE)
-                stdout_value, stderr_value = proc.communicate()
-                retcode = proc.wait()
-                os.chdir(cwd)
-                if retcode == 0:
-                    if not self.dry_run:
-                        target_tree.commit(commit_message)
-                    else:
-                        print '  - Branch passed test command'
-                else:
-                    if self.dry_run:
-                        print '  - Branch failed test command'
-                    target_tree.revert()
-                    comment = u'\n'.join([stdout_value, stderr_value])
-                    candidate.createComment(subject="Failed test command",
-                                            content=comment)
-                    candidate.queue_status = u'Needs review'
-                    candidate.lp_save()
-            else:
-                if not self.dry_run:
-                    target_tree.commit(commit_message)
-                else:
-                    target_tree.revert()
+            try:
+                tarmac_hooks['pre_tarmac_commit'].fire(
+                    self.options, self.configuration, candidate, temp_dir)
+                target_tree.commit()
+            except:
+                target_tree.revert()
+
+            tarmac_hooks['post_tarmac_commit'].fire()
+
+
+            #if self.test_command:
+            #    cwd = os.getcwd()
+            #    os.chdir(temp_dir)
+            #    proc = subprocess.Popen(self.test_command,
+            #                            shell=True,
+            #                            stdout=subprocess.PIPE,
+            #                            stderr=subprocess.PIPE)
+            #    stdout_value, stderr_value = proc.communicate()
+            #    retcode = proc.wait()
+            #    os.chdir(cwd)
+            #    if retcode == 0:
+            #        if not self.dry_run:
+            #            target_tree.commit(commit_message)
+            #        else:
+            #            print '  - Branch passed test command'
+            #    else:
+            #        if self.dry_run:
+            #            print '  - Branch failed test command'
+            #        target_tree.revert()
+            #        comment = u'\n'.join([stdout_value, stderr_value])
+            #        candidate.createComment(subject="Failed test command",
+            #                                content=comment)
+            #        candidate.queue_status = u'Needs review'
+            #        candidate.lp_save()
+            #else:
+            #    if not self.dry_run:
+            #        target_tree.commit(commit_message)
+            #    else:
+            #        target_tree.revert()
 
 
