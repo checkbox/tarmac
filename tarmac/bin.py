@@ -125,7 +125,8 @@ class TarmacLander(TarmacScript):
             sys.exit()
 
         candidates = [entry for entry in trunk.landing_candidates
-                        if entry.queue_status == u'Approved']
+                        if entry.queue_status == u'Approved' and
+                        entry.commit_message]
         if not candidates:
             self.logger.info('No branches approved to land.')
             return
@@ -142,13 +143,7 @@ class TarmacLander(TarmacScript):
 
         for candidate in candidates:
 
-            if not candidate.commit_message:
-                self.logger.error(
-                    'Proposal to merge %(source_branch)s contains an empty '
-                    'commit message.  Skipping.' % {
-                        'source_branch': candidate.source_branch.bzr_identity})
-                continue
-
+            # TODO: Devise a cleaner way to make the commit string.
             commit_dict = {}
             commit_dict['commit_line'] = candidate.commit_message
             # This is a great idea, but apparently reviewer isn't exposed
@@ -177,41 +172,9 @@ class TarmacLander(TarmacScript):
             try:
                 tarmac_hooks['pre_tarmac_commit'].fire(
                     self.options, self.configuration, candidate, temp_dir)
-                target_tree.commit()
+                target_tree.commit(commit_message)
             except:
                 target_tree.revert()
 
             tarmac_hooks['post_tarmac_commit'].fire()
-
-
-            #if self.test_command:
-            #    cwd = os.getcwd()
-            #    os.chdir(temp_dir)
-            #    proc = subprocess.Popen(self.test_command,
-            #                            shell=True,
-            #                            stdout=subprocess.PIPE,
-            #                            stderr=subprocess.PIPE)
-            #    stdout_value, stderr_value = proc.communicate()
-            #    retcode = proc.wait()
-            #    os.chdir(cwd)
-            #    if retcode == 0:
-            #        if not self.dry_run:
-            #            target_tree.commit(commit_message)
-            #        else:
-            #            print '  - Branch passed test command'
-            #    else:
-            #        if self.dry_run:
-            #            print '  - Branch failed test command'
-            #        target_tree.revert()
-            #        comment = u'\n'.join([stdout_value, stderr_value])
-            #        candidate.createComment(subject="Failed test command",
-            #                                content=comment)
-            #        candidate.queue_status = u'Needs review'
-            #        candidate.lp_save()
-            #else:
-            #    if not self.dry_run:
-            #        target_tree.commit(commit_message)
-            #    else:
-            #        target_tree.revert()
-
 
