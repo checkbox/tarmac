@@ -18,12 +18,16 @@ class Branch(object):
         self.has_tree = create_tree
         self.lp_branch = lp_branch
         self.branch = branch.Branch.open(self.lp_branch.bzr_identity)
-        if create_tree:
-            self.temporary_dir = os.path.join(
-                '/tmp', self.lp_branch.project.name)
-            if os.path.exists(self.temporary_dir):
-                shutil.rmtree(self.temporary_dir)
-            self.tree = self.branch.create_checkout(self.temporary_dir)
+        if self.has_tree:
+            self._set_up_working_tree()
+
+    def _set_up_working_tree(self):
+        '''Create the dir and working tree.'''
+        temporary_dir = os.path.join('/tmp', self.lp_branch.project.name)
+        if os.path.exists(temporary_dir):
+            shutil.rmtree(temporary_dir)
+        self.tree = self.branch.create_checkout(temporary_dir)
+
 
     def merge(self, branch):
         '''Merge from another tarmac.branch.Branch instance.'''
@@ -34,7 +38,13 @@ class Branch(object):
     def cleanup(self):
         '''Remove the working tree from the temp dir.'''
         if self.has_tree:
-            shutil.rmtree(self.temporary_dir)
+            self._set_up_working_tree()
+
+    def commit(self, commit_message):
+        '''Commit changes.'''
+        if not self.has_tree:
+            raise Exception('This branch has no working tree.')
+        self.tree.commit(commit_message)
 
     @property
     def landing_candidates(self):

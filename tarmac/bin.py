@@ -103,7 +103,7 @@ class TarmacLander(TarmacScript):
         '''See `TarmacScript.main`.'''
 
         try:
-            launchpad = get_launchpad_object(self.configuration, True)
+            launchpad = get_launchpad_object(self.configuration)
         except HTTPError:
             message = (
                 'Oops!  It appears that the OAuth token is invalid.  Please '
@@ -162,11 +162,15 @@ class TarmacLander(TarmacScript):
             try:
                 tarmac_hooks['pre_tarmac_commit'].fire(
                     self.options, self.configuration, candidate,
-                    trunk.temporary_dir)
-                #trunk.commit(commit_message)
-                print 'Would commit'
-            except :
-                print 'Failed hooks'
+                    trunk)
+                if self.dry_run:
+                    print 'Would commit but dry-run'
+                    trunk.cleanup()
+                else:
+                    print 'Committing...'
+                    trunk.commit(commit_message)
+            except Exception, e:
+                print e
                 trunk.cleanup()
 
             tarmac_hooks['post_tarmac_commit'].fire()
