@@ -164,10 +164,8 @@ class TarmacLander(TarmacScript):
                     self.options, self.configuration, candidate,
                     trunk)
                 if self.dry_run:
-                    print 'Would commit but dry-run'
                     trunk.cleanup()
                 else:
-                    print 'Committing...'
                     trunk.commit(commit_message)
             except Exception, e:
                 print e
