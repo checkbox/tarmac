@@ -23,10 +23,10 @@ class Branch(object):
 
     def _set_up_working_tree(self):
         '''Create the dir and working tree.'''
-        temporary_dir = os.path.join('/tmp', self.lp_branch.project.name)
-        if os.path.exists(temporary_dir):
-            shutil.rmtree(temporary_dir)
-        self.tree = self.branch.create_checkout(temporary_dir)
+        self.temporary_dir = os.path.join('/tmp', self.lp_branch.project.name)
+        if os.path.exists(self.temporary_dir):
+            shutil.rmtree(self.temporary_dir)
+        self.tree = self.branch.create_checkout(self.temporary_dir)
 
 
     def merge(self, branch):

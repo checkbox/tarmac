@@ -10,14 +10,16 @@ import sys
 
 from bzrlib import branch, bzrdir
 from bzrlib.errors import PointlessMerge
-from bzrlib.plugin import load_plugins
+from bzrlib.plugin import load_plugins as load_bzr_plugins
 from launchpadlib.errors import HTTPError
 
 from tarmac.branch import Branch
 from tarmac.config import TarmacConfig
 from tarmac.hooks import tarmac_hooks
+from tarmac.plugin import load_plugins
 from tarmac.utils import get_launchpad_object
 
+load_bzr_plugins()
 load_plugins()
 
 
