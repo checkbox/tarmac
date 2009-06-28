@@ -166,7 +166,8 @@ class TarmacLander(TarmacScript):
                 if self.dry_run:
                     trunk.cleanup()
                 else:
-                    trunk.commit(commit_message)
+                    trunk.commit(commit_message, authors=source_branch.authors)
+
             except Exception, e:
                 print e
                 trunk.cleanup()
