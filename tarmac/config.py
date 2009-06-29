@@ -39,6 +39,7 @@ class TarmacConfig:
 
     @property
     def commit_message_template(self):
+        '''Return the commit_message_template.'''
         return self.get('commit_message_template')
 
     @property
