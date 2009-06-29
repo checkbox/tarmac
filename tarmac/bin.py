@@ -4,11 +4,8 @@ import atexit
 import logging
 from optparse import OptionParser
 import os
-from shutil import rmtree
-import subprocess
 import sys
 
-from bzrlib import branch, bzrdir
 from bzrlib.errors import PointlessMerge
 from bzrlib.plugin import load_plugins as load_bzr_plugins
 from launchpadlib.errors import HTTPError
@@ -103,6 +100,7 @@ class TarmacLander(TarmacScript):
 
     def main(self):
         '''See `TarmacScript.main`.'''
+        # pylint: disable-msg=W0703
 
         try:
             launchpad = get_launchpad_object(self.configuration)
