@@ -47,11 +47,6 @@ class TarmacConfig:
         return self.get('test_command')
 
     @property
-    def commit_string(self):
-        '''Get the commit_string from the stored config.'''
-        return self.get('commit_string')
-
-    @property
     def log_file(self):
         '''Get the log_file from config or return a default.'''
         try:

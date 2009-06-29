@@ -136,23 +136,6 @@ class TarmacLander(TarmacScript):
 
         for candidate in candidates:
 
-            # TODO: Devise a cleaner way to make the commit string.
-            commit_dict = {}
-            commit_dict['commit_line'] = candidate.commit_message
-            # This is a great idea, but apparently reviewer isn't exposed
-            # in the API just yet.
-            #commit_dict['reviewers'] = self._get_reviewers(candidate)
-
-            if self.configuration.commit_string:
-                commit_string = self.configuration.commit_string
-            else:
-                commit_string = ('%(commit_line)s')
-            commit_message = commit_string % commit_dict
-
-            print '%(source_branch)s - %(commit_message)s' % {
-                'source_branch': candidate.source_branch.bzr_identity,
-                'commit_message': commit_message}
-
             source_branch = Branch(candidate.source_branch)
 
             try:
