@@ -48,6 +48,16 @@ class TarmacConfig:
         return self.get('test_command')
 
     @property
+    def cia_server(self):
+        '''Server for the CIA plugin.'''
+        return self.get('cia_server')
+
+    @property
+    def cia_project(self):
+        '''Project for the CIA plugin.'''
+        return self.get('cia_project')
+
+    @property
     def log_file(self):
         '''Get the log_file from config or return a default.'''
         try:
