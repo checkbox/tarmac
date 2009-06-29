@@ -35,7 +35,7 @@ class CIAVC(TarmacPlugin):
         [files.append(f) for (_x,f,_x,_x,_x,_x) in delta.renamed]
         [files.append(f) for (f,_x,_x,_x,_x) in delta.modified]
 
-        msg = '''
+        message = '''
 <message>
   <generator>
     <name>Tarmac</name>
@@ -48,8 +48,8 @@ class CIAVC(TarmacPlugin):
   </source>
   <body>
     <commit>
-      <revision>%(revno)s</revision>
-      <files>%(file)s</files>
+      <revision>%(revision)s</revision>
+      <files>%(files)s</files>
       <author>%(author)s</author>
       <log>%(commit_message)s</log>
     </commit>
@@ -63,10 +63,11 @@ class CIAVC(TarmacPlugin):
             'files': '\n'.join([
                 '<file>%s</file>' % saxutils.escape(f) for f in files]),
             'author': saxutils.escape(
-                trunk.lp_branch.source_branch.owner.displayname),
+                candidate.source_branch.owner.display_name),
             'commit_message': saxutils.escape(candidate.commit_message)}
 
-        xmlrpclib.ServerProxy(cia_server).hub.deliver(msg)
+        print "Updating cvs.vc for project " + cia_project
+        xmlrpclib.ServerProxy(cia_server).hub.deliver(message)
 
 tarmac_hooks['post_tarmac_commit'].hook(CIAVC(), 'CIA.vc plugin.')
 
