@@ -3,6 +3,8 @@
 import os
 import subprocess
 
+from bzrlib.errors import HookFailed
+
 from tarmac.hooks import tarmac_hooks
 from tarmac.plugins import TarmacPlugin
 
