@@ -1,8 +1,5 @@
 # Copyright 2009 Paul Hummer - See LICENSE
 '''Tarmac plugin for enforcing a commit message format.'''
-import os
-import subprocess
-
 from tarmac.hooks import tarmac_hooks
 from tarmac.plugins import TarmacPlugin
 
@@ -16,6 +13,7 @@ class CommitMessageTemplate(TarmacPlugin):
     '''
 
     def __call__(self, options, configuration, candidate, trunk):
+    # pylint: disable-msg=W0613
 
         if configuration.commit_message_template:
             self.template = configuration.commit_message_template
