@@ -168,7 +168,7 @@ class TarmacLander(TarmacScript):
                 if self.dry_run:
                     trunk.cleanup()
                 else:
-                    trunk.commit(commit_message)
+                    trunk.commit(candidate.commit_message)
             except Exception, e:
                 print e
                 trunk.cleanup()

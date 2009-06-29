@@ -38,6 +38,10 @@ class TarmacConfig:
             os.mkdir(os.path.expanduser('~/.config/tarmac/cachedir'))
 
     @property
+    def commit_message_template(self):
+        return self.get('commit_message_template')
+
+    @property
     def test_command(self):
         '''Get the test_command from the stored config.'''
         return self.get('test_command')
