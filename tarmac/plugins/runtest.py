@@ -47,7 +47,7 @@ class RunTest(TarmacPlugin):
             self.do_failed(stdout_value, stderr_value)
             raise HookFailed('runtest hook failed')
 
-    def do_failed(self):
+    def do_failed(self, stdout_value, stderr_value):
         '''Perform failure tests.
 
         In this case, the output of the test command is posted as a comment,
