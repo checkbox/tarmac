@@ -154,5 +154,6 @@ class TarmacLander(TarmacScript):
                 print e
                 trunk.cleanup()
 
-            tarmac_hooks['post_tarmac_commit'].fire()
+            tarmac_hooks['post_tarmac_commit'].fire(
+                self.options, self.configuration, candidate, trunk)
 
