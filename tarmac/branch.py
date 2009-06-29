@@ -3,7 +3,7 @@
 import os
 import shutil
 
-from bzrlib import branch
+from bzrlib import branch as bzr_branch
 
 
 class Branch(object):
@@ -17,7 +17,7 @@ class Branch(object):
 
         self.has_tree = create_tree
         self.lp_branch = lp_branch
-        self.branch = branch.Branch.open(self.lp_branch.bzr_identity)
+        self.branch = bzr_branch.Branch.open(self.lp_branch.bzr_identity)
         if self.has_tree:
             self._set_up_working_tree()
 
@@ -48,5 +48,6 @@ class Branch(object):
 
     @property
     def landing_candidates(self):
+        '''Wrap the LP representation of landing_candidates.'''
         return self.lp_branch.landing_candidates
 
