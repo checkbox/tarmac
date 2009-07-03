@@ -59,6 +59,25 @@ class TarmacAuthenticate(TarmacScript):
     This script is intended do nothing but get an OAuth token from Launchpad,
     and (optionally) output that token to a specified file.
     '''
+    def __init__(self, test_mode=False):
+        TarmacScript.__init__(self, test_mode)
+
+        self.configuration = TarmacConfig()
+
+        try:
+            self.filename = self.args[0]
+        except IndexError:
+            self.filename = None
+
+    def _create_option_parser(self):
+        '''See `TarmacScript._create_option_parser`.'''
+        parser = OptionParser("%prog [options] <projectname>")
+        return parser
+
+    def main(self):
+        '''See `TarmacScript`.'''
+        launchpad = get_launchpad_object(self.configuration,
+            filename=self.filename)
 
 
 class TarmacLander(TarmacScript):
