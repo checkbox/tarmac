@@ -53,8 +53,20 @@ class TarmacScript:
         raise NotImplementedError
 
 
+class TarmacAuthenticate(TarmacScript):
+    '''Tarmac authentication script.
+
+    This script is intended do nothing but get an OAuth token from Launchpad,
+    and (optionally) output that token to a specified file.
+    '''
+
+
 class TarmacLander(TarmacScript):
-    '''Tarmac script.'''
+    '''Tarmac landing script.
+
+    This script handles all landing of branches.  It does the actual work for
+    Tarmac.
+    '''
 
     def __init__(self, test_mode=False):
 
