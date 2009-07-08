@@ -35,13 +35,12 @@ class Branch(object):
         '''Get the authors from the last revision and use it.'''
         # XXX Need to get all authors from revisions not in target
         last_rev = self.branch.last_revision()
-        # If the list is None we need to make it empty first
-        if not self.author_list:
-            self.author_list = []
+        # Empty the list first since we're going to refresh it
+        self.author_list = []
         # Only query for authors if last_rev is not null:
         if last_rev != 'null:':
             rev = self.branch.repository.get_revision(last_rev)
-            self.author_list.append(rev.get_apparent_authors()[0])
+            self.author_list.extend(rev.get_apparent_authors())
 
     def merge(self, branch):
         '''Merge from another tarmac.branch.Branch instance.'''
@@ -54,13 +53,18 @@ class Branch(object):
         if self.has_tree:
             self._set_up_working_tree()
 
-    def commit(self, commit_message, authors=None):
+    def commit(self, commit_message, authors=None, **kw):
         '''Commit changes.'''
         if not self.has_tree:
             raise Exception('This branch has no working tree.')
         if not authors:
             authors = self.authors
+        elif not self.authors:
+            self.author_list = authors
+        else:
+            self.author_list.append(authors)
         self.tree.commit(commit_message, committer='Tarmac', authors=authors)
+        self._set_authors()
 
     @property
     def landing_candidates(self):
@@ -68,4 +72,6 @@ class Branch(object):
 
     @property
     def authors(self):
+        if self.author_list is None:
+            self._set_authors()
         return self.author_list
