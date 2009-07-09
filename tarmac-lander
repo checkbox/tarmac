@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 # Copyright 2009 Paul Hummer - See LICENSE
+import sys
 from tarmac.bin import TarmacLander
 
 if __name__ == '__main__':
     script = TarmacLander()
     script.main()
-
+    # Run the exit functions
+    sys.exitfunc()
