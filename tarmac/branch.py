@@ -3,7 +3,7 @@
 import os
 import shutil
 
-from bzrlib import branch as bzr_branch
+from bzrlib import branch as bzr_branch, revision
 
 
 class Branch(object):
@@ -17,6 +17,7 @@ class Branch(object):
 
         self.has_tree = create_tree
         self.lp_branch = lp_branch
+        self.author_list = None
         self.branch = bzr_branch.Branch.open(self.lp_branch.bzr_identity)
         if self.has_tree:
             self._set_up_working_tree()
@@ -27,7 +28,19 @@ class Branch(object):
         if os.path.exists(self.temporary_dir):
             shutil.rmtree(self.temporary_dir)
         self.tree = self.branch.create_checkout(self.temporary_dir)
+        if not self.author_list:
+            self._set_authors()
 
+    def _set_authors(self):
+        '''Get the authors from the last revision and use it.'''
+        # XXX Need to get all authors from revisions not in target
+        last_rev = self.branch.last_revision()
+        # Empty the list first since we're going to refresh it
+        self.author_list = []
+        # Only query for authors if last_rev is not null:
+        if last_rev != 'null:':
+            rev = self.branch.repository.get_revision(last_rev)
+            self.author_list.extend(rev.get_apparent_authors())
 
     def merge(self, branch):
         '''Merge from another tarmac.branch.Branch instance.'''
@@ -40,14 +53,26 @@ class Branch(object):
         if self.has_tree:
             self._set_up_working_tree()
 
-    def commit(self, commit_message):
+    def commit(self, commit_message, authors=None, **kw):
         '''Commit changes.'''
         if not self.has_tree:
             raise Exception('This branch has no working tree.')
-        self.tree.commit(commit_message)
+        if not authors:
+            authors = self.authors
+        elif not self.authors:
+            self.author_list = authors
+        else:
+            self.author_list.append(authors)
+        self.tree.commit(commit_message, committer='Tarmac', authors=authors)
+        self._set_authors()
 
     @property
     def landing_candidates(self):
         '''Wrap the LP representation of landing_candidates.'''
         return self.lp_branch.landing_candidates
 
+    @property
+    def authors(self):
+        if self.author_list is None:
+            self._set_authors()
+        return self.author_list
