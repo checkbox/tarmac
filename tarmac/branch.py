@@ -51,7 +51,7 @@ class Branch(object):
     def cleanup(self):
         '''Remove the working tree from the temp dir.'''
         if self.has_tree:
-            self._set_up_working_tree()
+            self.tree.revert()
 
     def commit(self, commit_message, authors=None, **kw):
         '''Commit changes.'''
