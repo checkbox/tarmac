@@ -76,3 +76,9 @@ class Branch(object):
         if self.author_list is None:
             self._set_authors()
         return self.author_list
+
+    @property
+    def has_changes(self):
+        if not self.has_tree:
+            return False
+        return self.tree.changes_from(self.tree.basis_tree())
