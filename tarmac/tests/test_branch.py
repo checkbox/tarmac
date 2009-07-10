@@ -59,6 +59,14 @@ class TestBranch(TestCaseInTempDir):
     def test_merge(self):
         '''A merge on a branch with a tree of a branch with changes will merge.
         '''
+        a_branch = branch.Branch(MockLPBranch(), create_tree=True)
+        another_branch = branch.Branch(MockLPBranch(
+            source_branch=a_branch.branch))
+        another_branch.lp_branch._internal_tree.commit('ABC...')
+        another_branch.lp_branch._internal_tree.commit('...as easy as 123')
+
+        a_branch.merge(another_branch)
+        a_branch.has_changes
 
     def test_merge_with_authors(self):
         '''A merge from a branch with authors'''
@@ -79,7 +87,7 @@ class TestBranch(TestCaseInTempDir):
         # effort.
         b_branch = branch.Branch(MockLPBranch())
         a_branch.merge(b_branch)
-        self.assertTrue(a_branch.has_changes())
+        self.assertTrue(a_branch.has_changes)
 
         a_branch.cleanup()
         self.assertTrue(a_branch.has_changes())
