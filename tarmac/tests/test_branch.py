@@ -19,6 +19,16 @@ class TestBranch(TestCaseInTempDir):
     #    temp_dir = os.path.join(os.getcwd(), "_trial_temp")
     #    os.environ['BZR_HOME'] = temp_dir
 
+    def make_two_branches_to_merge(self):
+        '''Make two branches, one with revisions to merge.'''
+        a_branch = branch.Branch(MockLPBranch(), create_tree=True)
+        another_branch = branch.Branch(MockLPBranch(
+            source_branch=a_branch.branch))
+        another_branch.lp_branch._internal_tree.commit('ABC...')
+        another_branch.lp_branch._internal_tree.commit('...as easy as 123')
+
+        return a_branch, another_branch
+
     def test_create(self):
         '''Test the creation of a TarmacBranch instance.'''
         a_branch = branch.Branch(MockLPBranch())
@@ -59,12 +69,7 @@ class TestBranch(TestCaseInTempDir):
     def test_merge(self):
         '''A merge on a branch with a tree of a branch with changes will merge.
         '''
-        a_branch = branch.Branch(MockLPBranch(), create_tree=True)
-        another_branch = branch.Branch(MockLPBranch(
-            source_branch=a_branch.branch))
-        another_branch.lp_branch._internal_tree.commit('ABC...')
-        another_branch.lp_branch._internal_tree.commit('...as easy as 123')
-
+        a_branch, another_branch = self.make_two_branches_to_merge()
         a_branch.merge(another_branch)
         a_branch.has_changes
 
@@ -78,16 +83,16 @@ class TestBranch(TestCaseInTempDir):
         branch2.commit('Authors Merge test', authors=branch1.authors)
         self.assertEquals(branch2.authors.sort(), authors.sort())
 
-    def DISABLEDtest_cleanup(self):
+    def test_cleanup(self):
         '''The branch object should clean up after itself.'''
         a_branch = branch.Branch(MockLPBranch(), create_tree=True)
         self.assertTrue(os.path.exists(a_branch.temporary_dir))
 
         # This is the part that's tricky, and will probably need a little more
         # effort.
-        b_branch = branch.Branch(MockLPBranch())
-        a_branch.merge(b_branch)
+        a_branch, another_branch = self.make_two_branches_to_merge()
+        a_branch.merge(another_branch)
         self.assertTrue(a_branch.has_changes)
 
         a_branch.cleanup()
-        self.assertTrue(a_branch.has_changes())
+        self.assertTrue(a_branch.has_changes)
