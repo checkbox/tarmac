@@ -5,18 +5,19 @@ import unittest
 
 from bzrlib import branch as bzr_branch
 from bzrlib.errors import NoCommits
+from bzrlib.tests import TestCaseInTempDir
 
 from tarmac import branch
 from tarmac.tests.mock import MockLPBranch
 
 
-class TestBranch(unittest.TestCase):
+class TestBranch(TestCaseInTempDir):
     '''Test for Tarmac.branch.Branch.'''
 
-    def setUp(self):
-        '''Set up the test environment.'''
-        temp_dir = os.path.join(os.getcwd(), "_trial_temp")
-        os.environ['BZR_HOME'] = temp_dir
+    #def setUp(self):
+    #    '''Set up the test environment.'''
+    #    temp_dir = os.path.join(os.getcwd(), "_trial_temp")
+    #    os.environ['BZR_HOME'] = temp_dir
 
     def test_create(self):
         '''Test the creation of a TarmacBranch instance.'''
@@ -69,6 +70,11 @@ class TestBranch(unittest.TestCase):
         a_branch = branch.Branch(MockLPBranch(), create_tree=True)
         self.assertTrue(os.path.exists(a_branch.temporary_dir))
 
-        a_branch.cleanup()
-        self.assertFalse(os.path.exists(a_branch.temporary_dir))
+        # This is the part that's tricky, and will probably need a little more
+        # effort.
+        b_branch = branch.Branch(MockLPBranch())
+        a_branch.merge(b_branch)
+        self.assertTrue(a_branch.has_changes())
 
+        a_branch.cleanup()
+        self.assertTrue(a_branch.has_changes())
