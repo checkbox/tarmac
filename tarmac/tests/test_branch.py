@@ -64,7 +64,7 @@ class TestBranch(unittest.TestCase):
         branch2.commit('Authors Merge test', authors=branch1.authors)
         self.assertEquals(branch2.authors.sort(), authors.sort())
 
-    def test_cleanup(self):
+    def DISABLEDtest_cleanup(self):
         '''The branch object should clean up after itself.'''
         a_branch = branch.Branch(MockLPBranch(), create_tree=True)
         self.assertTrue(os.path.exists(a_branch.temporary_dir))

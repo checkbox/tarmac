@@ -1,6 +1,9 @@
 # Copyright 2009 Paul Hummer - See LICENSE
 '''Tarmac plugin for running tests pre-commit.'''
 import os
+import subprocess
+
+from bzrlib.errors import HookFailed
 
 from tarmac.hooks import tarmac_hooks
 from tarmac.plugins import TarmacPlugin
@@ -16,19 +19,20 @@ class RunTest(TarmacPlugin):
     #TODO: Add the specific config it checks for.
     #TODO: Add the ability to override the test command in the command line.
 
-    def __call__(self, options, configuration, candidate, temp_dir):
+    def __call__(self, options, configuration, candidate, trunk):
 
         if options.test_command:
             self.test_command = options.test_command
         elif configuration.test_command:
             self.test_command = configuration.test_command
         else:
-            return
+            return True
 
         self.candidate = candidate
 
         cwd = os.getcwd()
-        os.chdir(temp_dir)
+        os.chdir(trunk.temporary_dir)
+        print 'Running test command: %s' % self.test_command
         proc = subprocess.Popen(
             self.test_command,
             shell=True,
@@ -38,14 +42,14 @@ class RunTest(TarmacPlugin):
         return_code = proc.wait()
         os.chdir(cwd)
 
-        if retcode == 0:
+        if return_code == 0:
             return
 
         else:
             self.do_failed(stdout_value, stderr_value)
             raise HookFailed('runtest hook failed')
 
-    def do_failed(self):
+    def do_failed(self, stdout_value, stderr_value):
         '''Perform failure tests.
 
         In this case, the output of the test command is posted as a comment,

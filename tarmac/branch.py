@@ -3,7 +3,7 @@
 import os
 import shutil
 
-from bzrlib import branch, revision
+from bzrlib import branch as bzr_branch, revision
 
 
 class Branch(object):
@@ -18,16 +18,16 @@ class Branch(object):
         self.has_tree = create_tree
         self.lp_branch = lp_branch
         self.author_list = None
-        self.branch = branch.Branch.open(self.lp_branch.bzr_identity)
+        self.branch = bzr_branch.Branch.open(self.lp_branch.bzr_identity)
         if self.has_tree:
             self._set_up_working_tree()
 
     def _set_up_working_tree(self):
         '''Create the dir and working tree.'''
-        temporary_dir = os.path.join('/tmp', self.lp_branch.project.name)
-        if os.path.exists(temporary_dir):
-            shutil.rmtree(temporary_dir)
-        self.tree = self.branch.create_checkout(temporary_dir)
+        self.temporary_dir = os.path.join('/tmp', self.lp_branch.project.name)
+        if os.path.exists(self.temporary_dir):
+            shutil.rmtree(self.temporary_dir)
+        self.tree = self.branch.create_checkout(self.temporary_dir)
         if not self.author_list:
             self._set_authors()
 
@@ -68,6 +68,7 @@ class Branch(object):
 
     @property
     def landing_candidates(self):
+        '''Wrap the LP representation of landing_candidates.'''
         return self.lp_branch.landing_candidates
 
     @property

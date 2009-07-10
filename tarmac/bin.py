@@ -4,20 +4,19 @@ import atexit
 import logging
 from optparse import OptionParser
 import os
-from shutil import rmtree
-import subprocess
 import sys
 
-from bzrlib import branch, bzrdir
 from bzrlib.errors import PointlessMerge
-from bzrlib.plugin import load_plugins
+from bzrlib.plugin import load_plugins as load_bzr_plugins
 from launchpadlib.errors import HTTPError
 
 from tarmac.branch import Branch
 from tarmac.config import TarmacConfig
 from tarmac.hooks import tarmac_hooks
+from tarmac.plugin import load_plugins
 from tarmac.utils import get_launchpad_object
 
+load_bzr_plugins()
 load_plugins()
 
 
@@ -54,8 +53,39 @@ class TarmacScript:
         raise NotImplementedError
 
 
+class TarmacAuthenticate(TarmacScript):
+    '''Tarmac authentication script.
+
+    This script is intended do nothing but get an OAuth token from Launchpad,
+    and (optionally) output that token to a specified file.
+    '''
+    def __init__(self, test_mode=False):
+        TarmacScript.__init__(self, test_mode)
+
+        self.configuration = TarmacConfig()
+
+        try:
+            self.filename = self.args[0]
+        except IndexError:
+            self.filename = None
+
+    def _create_option_parser(self):
+        '''See `TarmacScript._create_option_parser`.'''
+        parser = OptionParser("%prog [options] <projectname>")
+        return parser
+
+    def main(self):
+        '''See `TarmacScript`.'''
+        launchpad = get_launchpad_object(self.configuration,
+            filename=self.filename)
+
+
 class TarmacLander(TarmacScript):
-    '''Tarmac script.'''
+    '''Tarmac landing script.
+
+    This script handles all landing of branches.  It does the actual work for
+    Tarmac.
+    '''
 
     def __init__(self, test_mode=False):
 
@@ -101,6 +131,7 @@ class TarmacLander(TarmacScript):
 
     def main(self):
         '''See `TarmacScript.main`.'''
+        # pylint: disable-msg=W0703
 
         try:
             launchpad = get_launchpad_object(self.configuration)
@@ -134,23 +165,6 @@ class TarmacLander(TarmacScript):
 
         for candidate in candidates:
 
-            # TODO: Devise a cleaner way to make the commit string.
-            commit_dict = {}
-            commit_dict['commit_line'] = candidate.commit_message
-            # This is a great idea, but apparently reviewer isn't exposed
-            # in the API just yet.
-            #commit_dict['reviewers'] = self._get_reviewers(candidate)
-
-            if self.configuration.commit_string:
-                commit_string = self.configuration.commit_string
-            else:
-                commit_string = ('%(commit_line)s')
-            commit_message = commit_string % commit_dict
-
-            print '%(source_branch)s - %(commit_message)s' % {
-                'source_branch': candidate.source_branch.bzr_identity,
-                'commit_message': commit_message}
-
             source_branch = Branch(candidate.source_branch)
 
             try:
@@ -166,11 +180,13 @@ class TarmacLander(TarmacScript):
                 if self.dry_run:
                     trunk.cleanup()
                 else:
-                    trunk.commit(commit_message, authors=source_branch.authors)
+                    trunk.commit(candidate.commit_message,
+                                 authors=source_branch.authors)
 
             except Exception, e:
                 print e
                 trunk.cleanup()
 
-            tarmac_hooks['post_tarmac_commit'].fire()
+            tarmac_hooks['post_tarmac_commit'].fire(
+                self.options, self.configuration, candidate, trunk)
 

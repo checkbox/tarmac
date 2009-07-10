@@ -38,14 +38,24 @@ class TarmacConfig:
             os.mkdir(os.path.expanduser('~/.config/tarmac/cachedir'))
 
     @property
+    def commit_message_template(self):
+        '''Return the commit_message_template.'''
+        return self.get('commit_message_template')
+
+    @property
     def test_command(self):
         '''Get the test_command from the stored config.'''
         return self.get('test_command')
 
     @property
-    def commit_string(self):
-        '''Get the commit_string from the stored config.'''
-        return self.get('commit_string')
+    def cia_server(self):
+        '''Server for the CIA plugin.'''
+        return self.get('cia_server')
+
+    @property
+    def cia_project(self):
+        '''Project for the CIA plugin.'''
+        return self.get('cia_project')
 
     @property
     def log_file(self):

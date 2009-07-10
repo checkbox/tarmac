@@ -1,6 +1,6 @@
 # Copyright 2009 Paul Hummer - See LICENSE
 '''Tests for Tarmac scripts.'''
-# pylint: disable-msg=W0212
+# pylint: disable-msg=W0212,W0223
 __metaclass__ = type
 
 from optparse import OptionParser
