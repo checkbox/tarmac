@@ -47,13 +47,18 @@ class TestBranch(TestCaseInTempDir):
         self.assertRaises(
             Exception, a_branch.merge, another_branch)
 
-    def test_merge(self):
-        '''A merge on a branch with a tree will succeed.'''
+    def test_merge_no_changes(self):
+        '''A merge on a branch with a tree will raise an exception if no
+        changes are present.'''
         a_branch = branch.Branch(MockLPBranch(), create_tree=True)
         another_branch = branch.Branch(MockLPBranch())
 
         # XXX: Find a way to generate dummy revisions for the second branch.
         self.assertRaises(NoCommits, a_branch.merge, another_branch)
+
+    def test_merge(self):
+        '''A merge on a branch with a tree of a branch with changes will merge.
+        '''
 
     def test_merge_with_authors(self):
         '''A merge from a branch with authors'''
