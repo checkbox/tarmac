@@ -85,11 +85,6 @@ class TestBranch(TestCaseInTempDir):
 
     def test_cleanup(self):
         '''The branch object should clean up after itself.'''
-        a_branch = branch.Branch(MockLPBranch(), create_tree=True)
-        self.assertTrue(os.path.exists(a_branch.temporary_dir))
-
-        # This is the part that's tricky, and will probably need a little more
-        # effort.
         a_branch, another_branch = self.make_two_branches_to_merge()
         a_branch.merge(another_branch)
         self.assertTrue(a_branch.has_changes)
