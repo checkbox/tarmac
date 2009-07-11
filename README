@@ -38,3 +38,8 @@ focus of a project and any branches approved to merge into the branch.  One
 may test it out without merging by running:
 
   ``tarmac-lander <project> --dry-run``
+
+Tarmac recognizes branches to land when the merge proposal's status (not the
+votes) is "Approved" and a valid commit message has been set for the branch.
+If a branch isn't being picked up by Tarmac to land, then one of these issues
+is probably the culprit.
