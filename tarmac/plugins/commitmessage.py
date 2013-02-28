@@ -73,7 +73,7 @@ class CommitMessageTemplateInfo(object):
     @property
     def commit_message(self):
         """The commit message set in the merge proposal."""
-        return self._proposal.commit_message
+        return self._proposal.commit_message or "automatic merge by tarmac"
 
     @property
     def reviewer(self):
@@ -113,4 +113,4 @@ class CommitMessageTemplateInfo(object):
 
 
 tarmac_hooks['tarmac_pre_commit'].hook(CommitMessageTemplate(),
-    'Commit messsage template editor.')
+    'Commit message template editor.')

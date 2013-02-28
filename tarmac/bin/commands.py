@@ -28,6 +28,7 @@ from launchpadlib.uris import (LPNET_SERVICE_ROOT,
 
 from tarmac.bin import options
 from tarmac.branch import Branch
+from tarmac.config import BranchConfig
 from tarmac.hooks import tarmac_hooks
 from tarmac.log import set_up_debug_logging, set_up_logging
 from tarmac.exceptions import (
@@ -351,6 +352,7 @@ class cmd_merge(TarmacCommand):
         list returned will be in the order that they should be processed.
         """
         proposals = []
+        branch_config = BranchConfig(lp_branch.bzr_identity, self.config)
         sorted_proposals = sorted(
             lp_branch.landing_candidates, cmp=_compare_proposals)
         for entry in sorted_proposals:
@@ -364,6 +366,7 @@ class cmd_merge(TarmacCommand):
                 continue
 
             if (not self.config.imply_commit_message and
+                not branch_config.commit_message_template and 
                 not entry.commit_message):
                 self.logger.debug(
                     "  Skipping proposal: proposal has no commit message")

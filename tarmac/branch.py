@@ -47,7 +47,7 @@ class Branch(object):
         self.logger = logging.getLogger('tarmac')
 
     def __del__(self):
-        """Do some potenetially necessary cleanup during deletion."""
+        """Do some potentially necessary cleanup during deletion."""
         try:
             # If we were using a temp directory, then remove it
             shutil.rmtree(self.temp_tree_dir)
