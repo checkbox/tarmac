@@ -37,7 +37,7 @@ class CommitMessageTemplate(TarmacPlugin):
             return
 
         proposal.commit_message = self.render(
-            template, CommitMessageTemplateInfo(proposal))
+            template, CommitMessageTemplateInfo(source, proposal))
 
     def render(self, template, info):
         """Render a template using the given information."""
@@ -46,7 +46,8 @@ class CommitMessageTemplate(TarmacPlugin):
 
 class CommitMessageTemplateInfo(object):
 
-    def __init__(self, proposal):
+    def __init__(self, source, proposal):
+        self._source = source
         self._proposal = proposal
 
     def __getitem__(self, name):
@@ -73,7 +74,16 @@ class CommitMessageTemplateInfo(object):
     @property
     def commit_message(self):
         """The commit message set in the merge proposal."""
-        return self._proposal.commit_message or "automatic merge by tarmac"
+        if self._proposal.commit_message:
+            return self._proposal.commit_message
+
+        user_url = self._source.bzr_branch.user_url
+        if user_url:
+            user_url = user_url.replace("bzr+ssh://bazaar.launchpad.net/",
+                                        "lp:")
+            return "automatic merge of %s by tarmac" % user_url
+
+        return "automatic merge by tarmac"
 
     @property
     def reviewer(self):
